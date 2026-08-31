@@ -1,0 +1,8 @@
+assets/images/*.jpg
+qa-*.png
+reports/
+audit-site.cjs
+qa*.cjs
+optimize-images.py
+serve.js
+package.json

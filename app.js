@@ -1,7 +1,6 @@
 (() => {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const header = document.querySelector("[data-header]");
-  const progress = document.querySelector(".scroll-progress span");
   const menuButton = document.querySelector(".menu-toggle");
   const mobileMenu = document.querySelector(".mobile-menu");
   const locationSheet = document.querySelector(".location-sheet");
@@ -12,15 +11,56 @@
   const form = document.querySelector("#request-form");
   let lastLocationTrigger = null;
 
-  const updateScrollUI = () => {
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    const ratio = max > 0 ? window.scrollY / max : 0;
-    progress.style.transform = `scaleX(${ratio})`;
-    header.classList.toggle("is-scrolled", window.scrollY > 100);
+  const scriptPromises = new Map();
+  const loadScript = (src) => {
+    if (scriptPromises.has(src)) return scriptPromises.get(src);
+    const promise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.body.append(script);
+    });
+    scriptPromises.set(src, promise);
+    return promise;
+  };
+  const ensureThree = () => window.THREE
+    ? Promise.resolve()
+    : loadScript("assets/vendor/three.min.js");
+
+  const simulator = document.querySelector(".sim-canvas-wrap");
+  const loadSimulator = () => {
+    if (!simulator || simulator.dataset.simulatorLoading === "true") return;
+    simulator.dataset.simulatorLoading = "true";
+    ensureThree()
+      .then(() => loadScript("assets/js/towSimulator3d.js"))
+      .catch(() => { simulator.dataset.simulatorLoading = "false"; });
   };
 
-  updateScrollUI();
-  window.addEventListener("scroll", updateScrollUI, { passive: true });
+  if (simulator && "IntersectionObserver" in window) {
+    const simulatorObserver = new IntersectionObserver(([entry], observer) => {
+      if (!entry.isIntersecting) return;
+      observer.disconnect();
+      loadSimulator();
+    }, { rootMargin: "250px 0px" });
+    simulatorObserver.observe(simulator);
+  } else {
+    loadSimulator();
+  }
+
+  if (!reducedMotion && window.matchMedia("(min-width: 821px)").matches) {
+    ensureThree().then(() => loadScript("assets/js/radar3d.js")).catch(() => {});
+  } else {
+    document.querySelector("#heroRadarCanvas")?.remove();
+  }
+
+  const headerSentinel = document.querySelector(".header-sentinel");
+  if (headerSentinel && "IntersectionObserver" in window) {
+    const headerObserver = new IntersectionObserver(([entry]) => {
+      header.classList.toggle("is-scrolled", !entry.isIntersecting);
+    });
+    headerObserver.observe(headerSentinel);
+  }
 
   const focusableElements = (container) => [...container.querySelectorAll("a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex='-1'])")];
 
@@ -112,14 +152,35 @@
     );
   });
 
-  document.querySelectorAll(".accordion-item").forEach((item) => {
-    const activate = () => {
-      document.querySelectorAll(".accordion-item").forEach((entry) => entry.classList.remove("is-active"));
-      item.classList.add("is-active");
-    };
-    item.addEventListener("mouseenter", activate);
-    item.addEventListener("focus", activate);
-    item.addEventListener("click", activate);
+  const galleryTabs = [...document.querySelectorAll("[data-gallery-tab]")];
+  const galleryPanels = [...document.querySelectorAll("[data-gallery-panel]")];
+
+  const activateGallery = (tab, moveFocus = false) => {
+    const target = tab.dataset.galleryTab;
+    galleryTabs.forEach((item) => {
+      const active = item === tab;
+      item.classList.toggle("is-active", active);
+      item.setAttribute("aria-selected", String(active));
+      item.tabIndex = active ? 0 : -1;
+    });
+    galleryPanels.forEach((panel) => {
+      panel.hidden = panel.dataset.galleryPanel !== target;
+    });
+    if (moveFocus) tab.focus();
+  };
+
+  galleryTabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => activateGallery(tab));
+    tab.addEventListener("keydown", (event) => {
+      let nextIndex = index;
+      if (event.key === "ArrowRight") nextIndex = (index + 1) % galleryTabs.length;
+      else if (event.key === "ArrowLeft") nextIndex = (index - 1 + galleryTabs.length) % galleryTabs.length;
+      else if (event.key === "Home") nextIndex = 0;
+      else if (event.key === "End") nextIndex = galleryTabs.length - 1;
+      else return;
+      event.preventDefault();
+      activateGallery(galleryTabs[nextIndex], true);
+    });
   });
 
   form.addEventListener("submit", (event) => {
@@ -150,7 +211,8 @@
     window.location.href = `mailto:tktrans@inbox.lv?subject=${subject}&body=${body}`;
   });
 
-  if (!reducedMotion && window.gsap && window.ScrollTrigger) {
+  const initMotion = () => {
+    if (reducedMotion || !window.gsap || !window.ScrollTrigger) return;
     gsap.registerPlugin(ScrollTrigger);
 
     gsap.set(".hero-line > span", { yPercent: 110 });
@@ -207,7 +269,7 @@
       scrollTrigger: { trigger: ".editorial", start: "top 70%", end: "center 45%", scrub: 1 }
     });
 
-    gsap.utils.toArray(".accordion-item img, .service-card--photo img").forEach((image) => {
+    gsap.utils.toArray(".gallery-panel:not([hidden]) img, .service-card--photo img").forEach((image) => {
       gsap.fromTo(image, { scale: .92, opacity: .55 }, {
         scale: 1,
         opacity: 1,
@@ -224,5 +286,12 @@
       });
       button.addEventListener("pointerleave", () => gsap.to(button, { x: 0, y: 0, duration: .65, ease: "elastic.out(1,.4)" }));
     });
+  };
+
+  if (!reducedMotion && window.matchMedia("(min-width: 821px)").matches) {
+    loadScript("assets/vendor/gsap.min.js")
+      .then(() => loadScript("assets/vendor/ScrollTrigger.min.js"))
+      .then(initMotion)
+      .catch(() => {});
   }
 })();
