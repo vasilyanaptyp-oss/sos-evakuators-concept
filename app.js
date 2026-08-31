@@ -28,26 +28,6 @@
     ? Promise.resolve()
     : loadScript("assets/vendor/three.min.js");
 
-  const simulator = document.querySelector(".sim-canvas-wrap");
-  const loadSimulator = () => {
-    if (!simulator || simulator.dataset.simulatorLoading === "true") return;
-    simulator.dataset.simulatorLoading = "true";
-    ensureThree()
-      .then(() => loadScript("assets/js/towSimulator3d.js"))
-      .catch(() => { simulator.dataset.simulatorLoading = "false"; });
-  };
-
-  if (simulator && "IntersectionObserver" in window) {
-    const simulatorObserver = new IntersectionObserver(([entry], observer) => {
-      if (!entry.isIntersecting) return;
-      observer.disconnect();
-      loadSimulator();
-    }, { rootMargin: "250px 0px" });
-    simulatorObserver.observe(simulator);
-  } else {
-    loadSimulator();
-  }
-
   if (!reducedMotion && window.matchMedia("(min-width: 821px)").matches) {
     ensureThree().then(() => loadScript("assets/js/radar3d.js")).catch(() => {});
   } else {
