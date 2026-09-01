@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/images/logo.svg" type="image/svg+xml">
   <link rel="preload" href="assets/vendor/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/images/fleet-01-1200.webp" as="image" imagesrcset="assets/images/fleet-01-640.webp 640w, assets/images/fleet-01-1200.webp 1200w, assets/images/fleet-01.webp 1600w" imagesizes="(max-width: 820px) 92vw, (max-width: 1100px) 40vw, 44vw" fetchpriority="high">
-  <link rel="stylesheet" href="styles.css?v=20260901-flat-section">
+  <link rel="stylesheet" href="styles.css?v=20260901-client-revisions">
 </head>
 <body>
   <a class="skip-link" href="#saturs">Pāriet uz saturu</a>
@@ -71,23 +71,25 @@
       <div class="hero-grid">
         <div class="hero-copy">
           <p class="eyebrow reveal-item"><span></span>Daugavpilī, visā Latvijā un Eiropā.</p>
-          <h1 id="hero-title" aria-label="Mēs jau braucam pie jums!">
+          <h1 id="hero-title" aria-label="Ceļš apstājās? Mēs jau braucam pie jums!">
+            <span class="hero-line hero-question"><span>Ceļš apstājās?</span></span>
             <span class="hero-line"><span>Mēs jau braucam</span></span>
             <span class="hero-line accent-line"><span>pie jums!</span></span>
           </h1>
-          <p class="hero-lead reveal-item">Diennakts 00–24 palīdzība uz ceļa, autoevakuators un kravas evakuators.</p>
+          <p class="hero-lead reveal-item">00–24 palīdzība uz ceļa, auto evakuators, kravas evakuators.</p>
           <div class="hero-actions reveal-item">
-            <a class="primary-cta magnetic" href="tel:+37122002700">
+            <a class="primary-cta magnetic call-attention" href="tel:+37122002700">
               <svg class="phone-nudge" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8c1.5 3 3.8 5.3 6.8 6.8l2.3-2.3c.3-.3.8-.4 1.2-.2 1.3.4 2.6.7 4.1.7.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.5 22 2 13.5 2 3c0-.6.4-1 1-1h4.2c.6 0 1 .4 1 1 0 1.4.2 2.8.7 4.1.1.4 0 .9-.2 1.2l-2.1 2.5Z"/></svg>
               <span><small>Ātrākais veids saņemt palīdzību</small>Zvanīt +371 22002700</span>
             </a>
             <button class="location-cta" type="button" data-location-trigger>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-5.7 7-13a7 7 0 1 0-14 0c0 7.3 7 13 7 13Z"/><circle cx="12" cy="9" r="2.4"/></svg>
-              Sūtiet mums jūsu atrašanās vietu
+              Jūsu atrašanās vieta
             </button>
           </div>
           <div class="hero-facts reveal-item" aria-label="Pakalpojuma priekšrocības">
-            <div><strong>00–24 SOS</strong><span>palīdzība uz ceļa</span></div>
+            <div><strong>00–24</strong><span>palīdzība uz ceļa</span></div>
+            <div><strong>no 30 €</strong><span>auto evakuators</span></div>
             <div><strong>no 150 €</strong><span>kravas evakuators</span></div>
           </div>
         </div>
@@ -97,7 +99,7 @@
             <img src="assets/images/fleet-01-1200.webp" srcset="assets/images/fleet-01-640.webp 640w, assets/images/fleet-01-1200.webp 1200w, assets/images/fleet-01.webp 1600w" sizes="(max-width: 820px) 92vw, (max-width: 1100px) 40vw, 44vw" width="1600" height="1067" alt="SOS Evakuators transportē automašīnu Daugavpilī" decoding="async" fetchpriority="high">
           </div>
           <figcaption>
-            <span>Reāls izsaukums</span>
+            <span>00–24 palīdzība uz ceļa</span>
             <span>Daugavpils</span>
           </figcaption>
         </figure>
@@ -124,7 +126,7 @@
             <li>Treileris</li>
           </ul>
           <div class="capability-actions">
-            <a href="tel:+37122002700" class="primary-cta magnetic">
+            <a href="tel:+37122002700" class="primary-cta magnetic call-attention">
               <svg class="phone-nudge" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8c1.5 3 3.8 5.3 6.8 6.8l2.3-2.3c.3-.3.8-.4 1.2-.2 1.3.4 2.6.7 4.1.7.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.5 22 2 13.5 2 3c0-.6.4-1 1-1h4.2c.6 0 1 .4 1 1 0 1.4.2 2.8.7 4.1.1.4 0 .9-.2 1.2l-2.1 2.5Z"/></svg>
               <span><small>Palīdzība 00–24</small>Zvanīt +371 22002700</span>
             </a>
@@ -141,9 +143,9 @@
     <!-- ══════════ SERVICES SECTION ══════════ -->
     <section class="services chapter" id="pakalpojumi" aria-labelledby="services-title">
       <div class="section-heading">
-        <p class="eyebrow"><span></span>Palīdzēsim jebkurā situācijā 00–24</p>
-        <h2 id="services-title">Pastāstiet mums, kāda ir jūsu problēma.</h2>
-        <p>Kur jūs atrodaties? Mēs nosūtīsim pie jums atbilstošu evakuatoru.</p>
+        <p class="eyebrow"><span></span>Palīdzēsim jebkurā situācijā 24/7</p>
+        <h2 id="services-title">No pilsētas auto līdz smagai tehnikai.</h2>
+        <p>Pastāstiet mums, kāda ir jūsu problēma un kur jūs atrodaties. Mēs nosūtīsim pie jums atbilstošu evakuatoru.</p>
       </div>
 
       <div class="service-grid">
@@ -153,7 +155,7 @@
           <div class="card-no">A</div>
           <div class="service-card-copy">
             <h3>Auto evakuators</h3>
-            <p>Diennakts autoevakuācija, transportēšana, no CSN vietas, ar bloķētiem vai bojātiem riteņiem, izvilkšana, bloķēta stūre.</p>
+            <p>Diennakts autoevakuācija, transportēšana no CSN vietas, ar bloķētām vai bojātām riepām, izvilkšana, bloķēta stūre.</p>
             <a href="#request-form">Pieteikt izsaukumu <span>↘</span></a>
           </div>
         </article>
@@ -163,7 +165,7 @@
           <div class="card-no">B</div>
           <div class="service-card-copy">
             <h3>Kravas evakuators</h3>
-            <p>Kravas auto, autobusi un smagā tehnika.</p>
+            <p>Kravas auto, autobusi, smagā tehnika.</p>
             <a href="#request-form">Pieteikt izsaukumu <span>↘</span></a>
           </div>
         </article>
@@ -177,7 +179,9 @@
             <a href="#request-form">Pieteikt izsaukumu <span>↘</span></a>
           </div>
         </article>
-        <article class="service-card service-card--roadside service-card--yellow">
+        <article class="service-card service-card--photo service-card--roadside">
+          <img src="assets/images/fleet-04-1200.webp" srcset="assets/images/fleet-04-640.webp 640w, assets/images/fleet-04-1200.webp 1200w, assets/images/fleet-04.webp 1600w" sizes="(max-width: 820px) 92vw, 55vw" width="1600" height="1067" alt="AUTOPALĪDZĪBA.LV palīdzība uz ceļa" loading="lazy" decoding="async">
+          <div class="photo-shade"></div>
           <div class="card-no">D</div>
           <div class="service-card-copy">
             <h3>Diennakts palīdzība uz ceļa</h3>
@@ -248,14 +252,14 @@
     <!-- ══════════ EDITORIAL PHOTO BANNER ══════════ -->
     <section class="editorial chapter" aria-labelledby="editorial-title">
       <p class="eyebrow"><span></span>Viena komanda dažādam transportam</p>
-      <h2 id="editorial-title">No vieglā auto <span class="inline-image"><img src="assets/images/fleet-04-640.webp" srcset="assets/images/fleet-04-640.webp 640w, assets/images/fleet-04-1200.webp 1200w" sizes="240px" width="1600" height="1067" alt="" loading="lazy" decoding="async"></span> līdz smagai tehnikai.</h2>
+      <h2 id="editorial-title">No vieglā auto līdz kravas auto evakuācijai.</h2>
     </section>
 
     <!-- ══════════ GALLERY SECTION ══════════ -->
     <section class="work chapter" id="darbi" aria-labelledby="work-title">
       <div class="work-heading">
-        <p class="eyebrow light"><span></span>Reāli darbi</p>
-        <h2 id="work-title">Galerija</h2>
+        <p class="eyebrow light"><span></span>Reāli izsaukumi</p>
+        <h2 id="work-title">Mūsu darbi</h2>
         <p>Pašlaik izmantotas uzņēmuma esošās fotogrāfijas. Jaunās klienta fotogrāfijas varēs pievienot šeit.</p>
       </div>
       <div class="gallery-tabs" role="tablist" aria-label="Galerijas kategorijas">
@@ -285,15 +289,42 @@
     </section>
 
     <section class="reviews chapter" id="atsauksmes" aria-labelledby="reviews-title">
-      <div class="reviews-copy">
-        <p class="eyebrow"><span></span>Google atsauksmes</p>
-        <h2 id="reviews-title">Mūsu klientu atsauksmes</h2>
-        <p>Aktuālās atsauksmes ir pieejamas uzņēmuma Google profilā. Šeit varēs pieslēgt to automātisku attēlošanu.</p>
+      <div class="reviews-head">
+        <div class="reviews-copy">
+          <p class="eyebrow"><span></span>Google atsauksmes</p>
+          <h2 id="reviews-title">Mūsu klientu atsauksmes</h2>
+        </div>
+        <div class="reviews-score" aria-label="Google vērtējums 5,0 no 5, 313 atsauksmes">
+          <strong>5,0</strong>
+          <span class="review-stars" aria-hidden="true">★★★★★</span>
+          <span>313 Google atsauksmes</span>
+        </div>
       </div>
-      <div class="reviews-action" data-google-reviews aria-live="polite">
-        <p>Apskatiet aktuālās atsauksmes un dalieties ar savu pieredzi Google.</p>
-        <a class="reviews-link" href="https://g.page/r/CQ1F6-eN5ajgEAE/review" target="_blank" rel="noopener noreferrer">Atvērt Google atsauksmes <span aria-hidden="true">↗</span></a>
+      <div class="reviews-grid" data-google-reviews>
+        <article class="review-card">
+          <div class="review-card-head"><span class="review-initial" aria-hidden="true">Д</span><div><strong>Дмитрий Масенков</strong><span>pirms 8 mēnešiem</span></div></div>
+          <div class="review-stars" aria-label="5 no 5 zvaigznēm">★★★★★</div>
+          <blockquote lang="ru">«Приехали быстро, доставили в целости.»</blockquote>
+        </article>
+        <article class="review-card">
+          <div class="review-card-head"><span class="review-initial" aria-hidden="true">S</span><div><strong>Slavik Mitrofanov</strong><span>pirms mēneša</span></div></div>
+          <div class="review-stars" aria-label="5 no 5 zvaigznēm">★★★★★</div>
+          <blockquote lang="ru">«Очень быстро приезжают к месту эвакуации.»</blockquote>
+        </article>
+        <article class="review-card">
+          <div class="review-card-head"><span class="review-initial" aria-hidden="true">V</span><div><strong>Veronika Sokolovska</strong><span>pirms 2 mēnešiem</span></div></div>
+          <div class="review-stars" aria-label="5 no 5 zvaigznēm">★★★★★</div>
+          <blockquote lang="ru">«Быстро, качественно, адекватные цены.»</blockquote>
+        </article>
       </div>
+      <div class="reviews-action">
+        <div>
+          <p>Esiet apmierināti ar pakalpojumu?</p>
+          <h3>Uzrakstīt atsauksmi.</h3>
+        </div>
+        <a class="reviews-link" href="https://g.page/r/CQ1F6-eN5ajgEAE/review" target="_blank" rel="noopener noreferrer">Uzrakstīt atsauksmi <span aria-hidden="true">↗</span></a>
+      </div>
+      <p class="reviews-source">Google profilā pārbaudīts 01.09.2026.</p>
     </section>
 
     <!-- ══════════ CONTACT SECTION ══════════ -->
@@ -342,7 +373,7 @@
 
   <div class="mobile-dock" aria-label="Ātrā palīdzība">
     <a class="dock-call" href="tel:+37122002700"><svg class="phone-nudge" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8c1.5 3 3.8 5.3 6.8 6.8l2.3-2.3c.3-.3.8-.4 1.2-.2 1.3.4 2.6.7 4.1.7.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.5 22 2 13.5 2 3c0-.6.4-1 1-1h4.2c.6 0 1 .4 1 1 0 1.4.2 2.8.7 4.1.1.4 0 .9-.2 1.2l-2.1 2.5Z"/></svg> Zvanīt</a>
-    <button type="button" data-location-trigger title="Sūtiet mums jūsu atrašanās vietu"><span aria-hidden="true">⌖</span> Atrašanās vieta</button>
+    <button type="button" data-location-trigger title="Jūsu atrašanās vieta"><span aria-hidden="true">⌖</span> Jūsu atrašanās vieta</button>
   </div>
 
   <div class="location-sheet" id="location-sheet" aria-hidden="true" inert>
@@ -350,7 +381,7 @@
     <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="location-title">
       <button class="sheet-close" type="button" aria-label="Aizvērt atrašanās vietas logu" data-close-location>×</button>
       <p class="eyebrow"><span></span>Ātrākai palīdzībai</p>
-      <h2 id="location-title">Sūtiet mums jūsu atrašanās vietu.</h2>
+      <h2 id="location-title">Jūsu atrašanās vieta.</h2>
       <p>Pēc atļaujas saņemšanas sagatavosim īsziņu ar precīzu kartes saiti. Jūs varēsiet to pārbaudīt pirms nosūtīšanas.</p>
       <button class="primary-cta" type="button" id="share-location">Noteikt manu atrašanās vietu</button>
       <a class="sheet-fallback" href="tel:+37122002700">Vai vienkārši zvanīt +371 22002700</a>
@@ -358,6 +389,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20260901-flat-section"></script>
+  <script src="app.js?v=20260901-client-revisions"></script>
 </body>
 </html>

@@ -242,13 +242,6 @@
       });
     });
 
-    gsap.fromTo(".inline-image", { width: 0, opacity: 0 }, {
-      width: "1.4em",
-      opacity: 1,
-      ease: "power3.inOut",
-      scrollTrigger: { trigger: ".editorial", start: "top 70%", end: "center 45%", scrub: 1 }
-    });
-
     gsap.utils.toArray(".gallery-panel:not([hidden]) img, .service-card--photo img").forEach((image) => {
       gsap.fromTo(image, { scale: .92, opacity: .55 }, {
         scale: 1,
