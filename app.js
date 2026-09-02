@@ -163,11 +163,24 @@
     });
   });
 
-  form.addEventListener("submit", (event) => {
+  const photoInput = form.elements.photos;
+  const photoLabel = form.querySelector("[data-file-label]");
+  photoInput.addEventListener("change", () => {
+    const count = photoInput.files.length;
+    photoLabel.textContent = count === 0
+      ? "Foto nav izvēlēts"
+      : count === 1
+        ? photoInput.files[0].name
+        : `Izvēlēti ${count} foto`;
+  });
+
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const status = form.querySelector(".form-status");
     const required = [...form.querySelectorAll("[required]")];
     required.forEach((field) => field.classList.remove("is-invalid"));
+    const photoField = photoInput;
+    photoField.classList.remove("is-invalid");
     const phoneField = form.elements.phone;
     const invalid = required.filter((field) => !field.value.trim());
     if (phoneField.value.trim() && !/[0-9]{6,}/.test(phoneField.value.replace(/\s/g, ""))) invalid.push(phoneField);
@@ -179,16 +192,66 @@
         : "Lūdzu, aizpildiet vārdu, tālruni un situāciju.";
       return;
     }
+
+    const photos = [...photoField.files];
+    const totalPhotoSize = photos.reduce((sum, photo) => sum + photo.size, 0);
+    if (photos.some((photo) => !photo.type.startsWith("image/"))) {
+      photoField.classList.add("is-invalid");
+      photoField.focus();
+      status.textContent = "Lūdzu, pievienojiet tikai attēlu failus.";
+      return;
+    }
+    if (photos.length > 4 || totalPhotoSize > 20 * 1024 * 1024) {
+      photoField.classList.add("is-invalid");
+      photoField.focus();
+      status.textContent = "Pievienojiet ne vairāk kā 4 attēlus, kopā līdz 20 MB.";
+      return;
+    }
+
     const data = new FormData(form);
-    const subject = encodeURIComponent("Palīdzības pieprasījums no mājaslapas koncepta");
-    const body = encodeURIComponent([
+    const messageLines = [
+      "Palīdzības pieprasījums",
       `Vārds: ${data.get("name")}`,
       `Tālrunis: ${data.get("phone")}`,
       `Situācija: ${data.get("issue")}`,
       `Vieta / apraksts: ${data.get("details") || "Nav norādīts"}`
-    ].join("\n"));
-    status.textContent = "Atveram e-pasta lietotni ar sagatavotu pieprasījumu.";
-    window.location.href = `mailto:tktrans@inbox.lv?subject=${subject}&body=${body}`;
+    ];
+
+    if (photos.length) {
+      let canSharePhotos = false;
+      try {
+        canSharePhotos = typeof navigator.share === "function"
+          && typeof navigator.canShare === "function"
+          && navigator.canShare({ files: photos });
+      } catch (_) {
+        canSharePhotos = false;
+      }
+
+      if (canSharePhotos) {
+        status.textContent = "Atveram kopīgošanas izvēlni — izvēlieties WhatsApp.";
+        try {
+          await navigator.share({
+            title: "Palīdzības pieprasījums",
+            text: messageLines.join("\n"),
+            files: photos
+          });
+          status.textContent = "Pieprasījums nodots kopīgošanai.";
+          return;
+        } catch (error) {
+          if (error && error.name === "AbortError") {
+            status.textContent = "Kopīgošana atcelta. Varat mēģināt vēlreiz vai piezvanīt.";
+            return;
+          }
+        }
+      }
+
+      messageLines.push(`Foto: izvēlēti ${photos.length} — lūdzu, pievienojiet tos šai WhatsApp sarunai.`);
+    }
+
+    status.textContent = photos.length
+      ? "Atveram WhatsApp. Pievienojiet izvēlētos foto sarunai."
+      : "Atveram WhatsApp ar sagatavotu pieprasījumu.";
+    window.location.href = `https://wa.me/37122002700?text=${encodeURIComponent(messageLines.join("\n"))}`;
   });
 
   const initMotion = () => {
