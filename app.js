@@ -148,11 +148,20 @@
     formLocationLabel.textContent = "Nosakām atrašanās vietu…";
     formLocationStatus.textContent = "";
     formMapLink.hidden = true;
+    formMapLink.removeAttribute("href");
 
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
         const mapUrl = `https://maps.google.com/?q=${coords.latitude.toFixed(6)},${coords.longitude.toFixed(6)}`;
-        detailsField.value = `Precīza atrašanās vieta: ${mapUrl}`;
+        const locationPrefix = "Precīza atrašanās vieta:";
+        const currentDetails = detailsField.value
+          .split("\n")
+          .filter((line) => !line.trimStart().startsWith(locationPrefix))
+          .join("\n")
+          .trim();
+        detailsField.value = currentDetails
+          ? `${currentDetails}\n${locationPrefix} ${mapUrl}`
+          : `${locationPrefix} ${mapUrl}`;
         formMapLink.href = mapUrl;
         formMapLink.hidden = false;
         formLocationButton.disabled = false;
@@ -219,7 +228,10 @@
     photoField.classList.remove("is-invalid");
     const phoneField = form.elements.phone;
     const invalid = required.filter((field) => !field.value.trim());
-    if (phoneField.value.trim() && !/[0-9]{7,}/.test(phoneField.value.replace(/\s/g, ""))) invalid.push(phoneField);
+    const phoneValue = phoneField.value.trim();
+    const phoneDigits = phoneValue.replace(/\D/g, "");
+    const hasValidPhoneCharacters = /^\+?[\d\s().-]+$/.test(phoneValue);
+    if (phoneValue && (!hasValidPhoneCharacters || phoneDigits.length < 7)) invalid.push(phoneField);
     if (invalid.length) {
       invalid.forEach((field) => field.classList.add("is-invalid"));
       invalid[0].focus();
