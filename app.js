@@ -132,6 +132,42 @@
     );
   });
 
+  const formLocationButton = form.querySelector("[data-form-location]");
+  const formLocationLabel = form.querySelector("[data-form-location-label]");
+  const formMapLink = form.querySelector("[data-form-map-link]");
+  const formLocationStatus = form.querySelector(".form-location-status");
+  const detailsField = form.elements.details;
+
+  formLocationButton.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      formLocationStatus.textContent = "Šī ierīce neatbalsta atrašanās vietas noteikšanu. Ievadiet adresi manuāli.";
+      return;
+    }
+
+    formLocationButton.disabled = true;
+    formLocationLabel.textContent = "Nosakām atrašanās vietu…";
+    formLocationStatus.textContent = "";
+    formMapLink.hidden = true;
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const mapUrl = `https://maps.google.com/?q=${coords.latitude.toFixed(6)},${coords.longitude.toFixed(6)}`;
+        detailsField.value = `Precīza atrašanās vieta: ${mapUrl}`;
+        formMapLink.href = mapUrl;
+        formMapLink.hidden = false;
+        formLocationButton.disabled = false;
+        formLocationLabel.textContent = "Atjaunot atrašanās vietu";
+        formLocationStatus.textContent = "Atrašanās vieta pievienota pieprasījumam. Karti varat pārbaudīt pirms nosūtīšanas.";
+      },
+      () => {
+        formLocationButton.disabled = false;
+        formLocationLabel.textContent = "Mēģināt vēlreiz";
+        formLocationStatus.textContent = "Neizdevās noteikt atrašanās vietu. Pārbaudiet atļauju vai ievadiet adresi manuāli.";
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 }
+    );
+  });
+
   const galleryTabs = [...document.querySelectorAll("[data-gallery-tab]")];
   const galleryPanels = [...document.querySelectorAll("[data-gallery-panel]")];
 
@@ -183,12 +219,12 @@
     photoField.classList.remove("is-invalid");
     const phoneField = form.elements.phone;
     const invalid = required.filter((field) => !field.value.trim());
-    if (phoneField.value.trim() && !/[0-9]{6,}/.test(phoneField.value.replace(/\s/g, ""))) invalid.push(phoneField);
+    if (phoneField.value.trim() && !/[0-9]{7,}/.test(phoneField.value.replace(/\s/g, ""))) invalid.push(phoneField);
     if (invalid.length) {
       invalid.forEach((field) => field.classList.add("is-invalid"));
       invalid[0].focus();
       status.textContent = invalid.includes(phoneField) && phoneField.value.trim()
-        ? "Lūdzu, pārbaudiet tālruņa numuru — nepieciešami vismaz seši cipari."
+        ? "Lūdzu, pārbaudiet tālruņa numuru — nepieciešami vismaz septiņi cipari."
         : "Lūdzu, aizpildiet vārdu, tālruni un situāciju.";
       return;
     }
