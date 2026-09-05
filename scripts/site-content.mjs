@@ -56,7 +56,6 @@ export const T = {
     dock: { call: "Zvanīt", location: "Jūsu atrašanās vieta", dockAria: "Ātrā palīdzība" },
     footer: {
       tagline: "Diennakts auto un kravas evakuācija Daugavpilī, visā Latvijā un Eiropā.",
-      conceptNote: "Interaktīvs sākumlapas koncepts",
       privacy: "Privātuma politika",
       copyright: "© 2026 SOS Evakuators"
     },
@@ -128,7 +127,6 @@ export const T = {
       work: {
         eyebrow: "Reāli izsaukumi",
         h2: "Mūsu darbi",
-        p: "Pašlaik izmantotas uzņēmuma esošās fotogrāfijas. Jaunās klienta fotogrāfijas varēs pievienot šeit.",
         tabs: ["Autoevakuators", "Kravas evakuators", "Treileris", "Palīdzība uz ceļa"],
         alts: ["Autoevakuators darbā", "Kravas evakuators darbā", "Treileris transportē tehniku", "Palīdzība uz ceļa"]
       },
@@ -183,7 +181,7 @@ export const T = {
         sections: {
           about: {
             h2: "Vieglā auto evakuācija bez pārtraukumiem.",
-            lead: "Auto neiedzišas, radusies avārija vai jānogādā mašīna servisā? Zvaniet — nosūtīsim evakuatoru.",
+            lead: "Auto nebrauc, radusies avārija vai jānogādā mašīna servisā? Zvaniet — nosūtīsim evakuatoru.",
             p: "Transportējam vieglos auto, džipus, minibusus un motociklus. Strādājam arī ar bojātām vai bloķētām riepām, bloķētu stūri un auto, kas nav braucamspējīgs pēc ceļu satiksmes negadījuma."
           },
           includesH2: "Kas ietilpst pakalpojumā",
@@ -388,7 +386,6 @@ export const T = {
     dock: { call: "Позвонить", location: "Ваше местоположение", dockAria: "Быстрая помощь" },
     footer: {
       tagline: "Круглосуточная эвакуация легковых и грузовых авто в Даугавпилсе, по всей Латвии и Европе.",
-      conceptNote: "Интерактивная концепт-версия сайта",
       privacy: "Политика конфиденциальности",
       copyright: "© 2026 SOS Evakuators"
     },
@@ -460,7 +457,6 @@ export const T = {
       work: {
         eyebrow: "Реальные вызовы",
         h2: "Наши работы",
-        p: "Сейчас используются существующие фотографии компании. Новые фото клиента сможем добавить здесь.",
         tabs: ["Автоэвакуатор", "Грузовой эвакуатор", "Трейлер", "Помощь на дороге"],
         alts: ["Автоэвакуатор в работе", "Грузовой эвакуатор в работе", "Трейлер перевозит технику", "Помощь на дороге"]
       },
@@ -720,7 +716,6 @@ export const T = {
     dock: { call: "Call", location: "Your location", dockAria: "Quick help" },
     footer: {
       tagline: "Around-the-clock car and truck towing in Daugavpils, across Latvia and Europe.",
-      conceptNote: "Interactive homepage concept",
       privacy: "Privacy policy",
       copyright: "© 2026 SOS Evakuators"
     },
@@ -792,7 +787,6 @@ export const T = {
       work: {
         eyebrow: "Real call-outs",
         h2: "Our work",
-        p: "The company's existing photographs are used for now. New client photos can be added here.",
         tabs: ["Car towing", "Truck towing", "Trailer transport", "Roadside assistance"],
         alts: ["Car tow truck at work", "Truck tow truck at work", "Trailer transporting machinery", "Roadside assistance"]
       },
@@ -1035,9 +1029,9 @@ export const BUSINESS = {
 
 // Per-service og:image (jpg for maximal social crawler compatibility).
 export const SERVICE_OG = {
-  auto: "assets/images/fleet-01.jpg",
-  kravas: "assets/images/hero.jpg",
-  cela: "assets/images/fleet-04.jpg",
-  izvilkshana: "assets/images/fleet-05.jpg",
-  latgale: "assets/images/fleet-03.jpg"
+  auto: "assets/images/fleet-01-1200.webp",
+  kravas: "assets/images/hero-1200.webp",
+  cela: "assets/images/fleet-04-1200.webp",
+  izvilkshana: "assets/images/fleet-05-1200.webp",
+  latgale: "assets/images/fleet-03-1200.webp"
 };

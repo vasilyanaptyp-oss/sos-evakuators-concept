@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { LANGS, LANG_META, SERVICES, T, BUSINESS, SERVICE_OG } from "./site-content.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const ASSETS_V = "20260905-hero-gap";
+const ASSETS_V = "20260905-cleanup";
 const CONCEPT_BASE = "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
 const PRODUCTION_BASE = "https://autopalidziba.lv";
 const CONCEPT_ROBOTS = "noindex, nofollow";
@@ -67,7 +67,7 @@ const businessSchema = (withRating) => ({
   url: `${BASE}/`,
   telephone: BUSINESS.phone,
   email: BUSINESS.email,
-  image: `${BASE}/assets/images/fleet-01.jpg`,
+  image: `${BASE}/assets/images/fleet-01-1200.webp`,
   logo: `${BASE}/assets/images/logo.svg`,
   priceRange: "€€",
   sameAs: BUSINESS.sameAs,
@@ -259,7 +259,7 @@ function footer(lang, page, dirSegments) {
       </div>
     </div>
     <div class="footer-bottom">
-      <span>${esc(t.footer.conceptNote)}</span>
+      <a href="mailto:${BUSINESS.email}">${BUSINESS.email}</a>
       <a href="${privacyHref}" rel="noopener">${esc(t.footer.privacy)}</a>
       <span>${esc(t.footer.copyright)}</span>
     </div>
@@ -501,7 +501,6 @@ ${serviceCards}
       <div class="work-heading">
         <p class="eyebrow light"><span></span>${esc(h.work.eyebrow)}</p>
         <h2 id="work-title">${esc(h.work.h2)}</h2>
-        <p>${esc(h.work.p)}</p>
       </div>
       <div class="gallery-tabs" role="tablist" aria-label="${esc(h.work.h2)}">
 ${galleryTabs}
