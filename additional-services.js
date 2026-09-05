@@ -2,6 +2,10 @@
   const menuButton = document.querySelector(".menu-toggle");
   const mobileMenu = document.querySelector(".mobile-menu");
 
+  // Isolated pages have no top call CTA, so the dock is always available.
+  const dock = document.querySelector(".mobile-dock");
+  if (dock) dock.classList.add("is-visible");
+
   if (!menuButton || !mobileMenu) return;
 
   const focusableElements = () => [
