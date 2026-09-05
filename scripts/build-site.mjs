@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { LANGS, LANG_META, SERVICES, T, BUSINESS, SERVICE_OG } from "./site-content.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const ASSETS_V = "20260905-cleanup";
+const ASSETS_V = "20260906-hero-feedback";
 const CONCEPT_BASE = "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
 const PRODUCTION_BASE = "https://autopalidziba.lv";
 const CONCEPT_ROBOTS = "noindex, nofollow";
@@ -389,12 +389,13 @@ ${mobileMenu(lang, "home", dirSegments)}
         <div class="hero-copy">
           <p class="eyebrow reveal-item"><span></span>${esc(t.hero.eyebrow)}</p>
           <h1 id="hero-title">
-            <span class="hero-line"><span>${esc(t.hero.h1a)}</span></span>
-            <span class="hero-line hero-line--accent"><span>${esc(t.hero.h1b)}</span></span>
+            <span class="hero-line hero-line--accent"><span>${esc(t.hero.h1a)}</span></span>
+            <span class="hero-line"><span>${esc(t.hero.h1b)}</span></span>
           </h1>
           <p class="hero-tagline reveal-item"><span class="accent">${esc(t.hero.taglineAccent)}</span>${esc(t.hero.taglineRest)}</p>
         </div>
         <div class="hero-cta-row reveal-item">
+          <p class="hero-cta-hint">${esc(t.hero.ctaHint)}</p>
           <a class="primary-cta primary-cta--big magnetic call-attention call-rattle" href="tel:${BUSINESS.phone}" data-dock-watch>
             ${PHONE_SVG.replace("<svg ", '<svg class="phone-nudge" ')}
             <span><small>${esc(t.hero.ctaSmall)}</small><strong>${BUSINESS.phoneDisplay}</strong></span>
@@ -651,6 +652,7 @@ ${mobileMenu(lang, key, dirSegments)}
         </h1>
         <p class="hero-tagline reveal-item">${esc(p.tagline)}</p>
         <div class="hero-cta-row reveal-item">
+          <p class="hero-cta-hint">${esc(t.hero.ctaHint)}</p>
           <a class="primary-cta primary-cta--big magnetic call-attention call-rattle" href="tel:${BUSINESS.phone}" data-dock-watch>
             ${PHONE_SVG.replace("<svg ", '<svg class="phone-nudge" ')}
             <span><small>${esc(t.hero.ctaSmall)}</small><strong>${BUSINESS.phoneDisplay}</strong></span>

@@ -50,6 +50,7 @@ export const T = {
       taglineRest: " Mēs jau braucam pie jums!",
       ctaSmall: "Zvanīt",
       ctaNumber: "+371 22002700",
+      ctaHint: "Ātrākais veids saņemt palīdzību",
       availability: "Atbildam diennakti"
     },
     servicesMenuAria: "Evakuatora pakalpojumi",
@@ -380,6 +381,7 @@ export const T = {
       taglineRest: " Мы уже едем к вам!",
       ctaSmall: "Позвонить",
       ctaNumber: "+371 22002700",
+      ctaHint: "Самый быстрый способ получить помощь",
       availability: "Отвечаем круглосуточно"
     },
     servicesMenuAria: "Услуги эвакуатора",
@@ -710,6 +712,7 @@ export const T = {
       taglineRest: " We're already on our way!",
       ctaSmall: "Call",
       ctaNumber: "+371 22002700",
+      ctaHint: "The fastest way to get help",
       availability: "We answer around the clock"
     },
     servicesMenuAria: "Tow truck services",
