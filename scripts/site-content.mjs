@@ -70,8 +70,8 @@ export const T = {
       backdrop: "Aizvērt"
     },
     home: {
-      title: "Evakuators Daugavpilī | SOS Evakuators 00–24",
-      description: "Diennakts evakuators Daugavpilī: auto un kravas evakuācija, palīdzība uz ceļa visā Latvijā un Eiropā. Zvani +371 22002700.",
+      title: "Evakuators Daugavpilī 00–24 | Zvani: +371 22002700",
+      description: "Diennakts evakuators Daugavpilī un visā Latgalē: auto un kravas evakuācija, palīdzība uz ceļa visā Latvijā un Eiropā. Zvani +371 22002700.",
       ogTitle: "SOS Evakuators Daugavpilī — 00–24",
       ogDescription: "Auto un kravas evakuācija, palīdzība uz ceļa un tehnikas transportēšana.",
       marqueeAria: "Transportlīdzekļu veidi",
@@ -402,8 +402,8 @@ export const T = {
       backdrop: "Закрыть"
     },
     home: {
-      title: "Эвакуатор Даугавпилс 00–24 | SOS Evakuators",
-      description: "Круглосуточный эвакуатор в Даугавпилсе: эвакуация легковых и грузовых авто, помощь на дороге по всей Латвии и Европе. Звоните +371 22002700.",
+      title: "Эвакуатор Даугавпилс 00–24 | Звоните: +371 22002700",
+      description: "Круглосуточный эвакуатор в Даугавпилсе и всей Латгалии: эвакуация легковых и грузовых авто, помощь на дороге по всей Латвии и Европе. Звоните +371 22002700.",
       ogTitle: "SOS Evakuators Даугавпилс — 00–24",
       ogDescription: "Эвакуация легковых и грузовых авто, помощь на дороге и транспортировка техники.",
       marqueeAria: "Виды транспорта",
@@ -734,8 +734,8 @@ export const T = {
       backdrop: "Close"
     },
     home: {
-      title: "Tow Truck Daugavpils 24/7 | SOS Evakuators",
-      description: "24/7 tow truck in Daugavpils: car and heavy vehicle towing, roadside assistance across Latvia and Europe. Call +371 22002700.",
+      title: "Tow Truck Daugavpils 24/7 | Call +371 22002700",
+      description: "24/7 tow truck in Daugavpils and across Latgale: car and heavy vehicle towing, roadside assistance across Latvia and Europe. Call +371 22002700.",
       ogTitle: "SOS Evakuators Daugavpils — 00–24",
       ogDescription: "Car and truck towing, roadside assistance and machinery transport.",
       marqueeAria: "Vehicle types",
@@ -1027,7 +1027,7 @@ export const BUSINESS = {
   phoneSecondary: "+37120091762",
   phoneSecondaryDisplay: "+371 20091762",
   email: "tktrans@inbox.lv",
-  sameAs: ["https://autopalidziba.lv/", "https://www.facebook.com/autopalidziba.lv/"],
+  sameAs: ["https://autopalidziba.lv/", "https://www.facebook.com/autopalidziba.lv/", "https://www.google.com/maps/place/?q=place_id:ChIJ7-Ug3hGVwkYRDUXr543lqOA"],
   rating: { value: "5", count: 313, noteChecked: "01.09.2026" },
   logo: "assets/images/logo.svg",
   defaultOgImage: "assets/images/client-collage-hero-v2-1200.webp"

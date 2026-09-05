@@ -393,13 +393,12 @@ ${mobileMenu(lang, "home", dirSegments)}
             <span class="hero-line hero-line--accent"><span>${esc(t.hero.h1b)}</span></span>
           </h1>
           <p class="hero-tagline reveal-item"><span class="accent">${esc(t.hero.taglineAccent)}</span>${esc(t.hero.taglineRest)}</p>
-          <div class="hero-cta-row reveal-item">
-            <a class="primary-cta primary-cta--big magnetic call-attention call-rattle" href="tel:${BUSINESS.phone}" data-dock-watch>
-              ${PHONE_SVG.replace("<svg ", '<svg class="phone-nudge" ')}
-              <span><small>${esc(t.hero.ctaSmall)}</small><strong>${BUSINESS.phoneDisplay}</strong></span>
-            </a>
-          </div>
-          <p class="hero-availability reveal-item"><i></i>${esc(t.hero.availability)}</p>
+        </div>
+        <div class="hero-cta-row reveal-item">
+          <a class="primary-cta primary-cta--big magnetic call-attention call-rattle" href="tel:${BUSINESS.phone}" data-dock-watch>
+            ${PHONE_SVG.replace("<svg ", '<svg class="phone-nudge" ')}
+            <span><small>${esc(t.hero.ctaSmall)}</small><strong>${BUSINESS.phoneDisplay}</strong></span>
+          </a>
         </div>
       </div>
       <div class="hero-edge" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
@@ -658,7 +657,6 @@ ${mobileMenu(lang, key, dirSegments)}
             <span><small>${esc(t.hero.ctaSmall)}</small><strong>${BUSINESS.phoneDisplay}</strong></span>
           </a>
         </div>
-        <p class="hero-availability reveal-item"><i></i>${esc(p.availability)}</p>
       </div>
     </section>
 

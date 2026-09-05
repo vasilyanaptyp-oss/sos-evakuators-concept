@@ -471,7 +471,7 @@
       const intro = gsap.timeline({ defaults: { ease: "power4.out" } });
       intro
         .to(".hero-line > span", { yPercent: 0, duration: 1.1, stagger: 0.12 })
-        .from(".hero .eyebrow, .hero-tagline, .hero-cta-row, .hero-availability", { opacity: 0, y: 24, duration: .85, stagger: .1, clearProps: "all" }, "-=.75");
+        .from(".hero .eyebrow, .hero-tagline, .hero-cta-row", { opacity: 0, y: 24, duration: .85, stagger: .1, clearProps: "all" }, "-=.75");
     }
 
     gsap.utils.toArray(".section-heading h2, .pricing-head h2, .work-heading h2, .contact-copy h2, .svc-shell h2, .cta-band h2").forEach((heading) => {
