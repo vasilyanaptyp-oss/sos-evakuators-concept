@@ -52,6 +52,7 @@ export const T = {
       ctaNumber: "+371 22002700",
       ctaHint: "Ātrākais veids saņemt palīdzību",
       secondLine: "Nav atbildes? Tad zvaniet uz otro numuru",
+      mapAlt: "Tu neesi viens uz ceļa! — Latvijas karte ar izceltu Latgali",
       availability: "Atbildam diennakti"
     },
     servicesMenuAria: "Evakuatora pakalpojumi",
@@ -384,6 +385,7 @@ export const T = {
       ctaNumber: "+371 22002700",
       ctaHint: "Самый быстрый способ получить помощь",
       secondLine: "Нет ответа? Тогда звоните на второй номер",
+      mapAlt: "Карта Латвии с выделенной Латгалией — Ты не один на дороге!",
       availability: "Отвечаем круглосуточно"
     },
     servicesMenuAria: "Услуги эвакуатора",
@@ -716,6 +718,7 @@ export const T = {
       ctaNumber: "+371 22002700",
       ctaHint: "The fastest way to get help",
       secondLine: "No answer? Then call the second number",
+      mapAlt: "Map of Latvia with Latgale highlighted — You are not alone on the road!",
       availability: "We answer around the clock"
     },
     servicesMenuAria: "Tow truck services",

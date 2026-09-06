@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { LANGS, LANG_META, SERVICES, T, BUSINESS, SERVICE_OG } from "./site-content.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const ASSETS_V = "20260906-client-tweaks";
+const ASSETS_V = "20260906-hero-map-mobile";
 const CONCEPT_BASE = "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
 const PRODUCTION_BASE = "https://autopalidziba.lv";
 const CONCEPT_ROBOTS = "noindex, nofollow";
@@ -393,6 +393,9 @@ ${mobileMenu(lang, "home", dirSegments)}
             <span class="hero-line"><span>${esc(t.hero.h1b)}</span></span>
           </h1>
           <p class="hero-tagline reveal-item"><span class="accent">${esc(t.hero.taglineAccent)}</span>${esc(t.hero.taglineRest)}</p>
+          <figure class="hero-map reveal-item">
+            <img src="${assetPrefix}assets/images/tu-neesi-viens-uz-cela-1080.webp" srcset="${assetPrefix}assets/images/tu-neesi-viens-uz-cela-640.webp 640w, ${assetPrefix}assets/images/tu-neesi-viens-uz-cela-1080.webp 1080w" sizes="(max-width: 820px) 92vw, 560px" width="1080" height="492" alt="${esc(t.hero.mapAlt)}" loading="lazy" decoding="async">
+          </figure>
         </div>
         <div class="hero-cta-row reveal-item">
           <p class="hero-cta-hint">${esc(t.hero.ctaHint)}</p>
