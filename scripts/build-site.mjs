@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { LANGS, LANG_META, SERVICES, T, BUSINESS, SERVICE_OG } from "./site-content.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const ASSETS_V = "20260906-hero-desktop";
+const ASSETS_V = "20260906-client-tweaks";
 const CONCEPT_BASE = "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
 const PRODUCTION_BASE = "https://autopalidziba.lv";
 const CONCEPT_ROBOTS = "noindex, nofollow";
@@ -403,6 +403,10 @@ ${mobileMenu(lang, "home", dirSegments)}
         </div>
       </div>
       <div class="hero-edge" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    </section>
+
+    <section class="second-call-strip" aria-label="${esc(t.secondPhoneSmall)}">
+      <p><span>${esc(t.hero.secondLine)}</span> <a href="tel:${BUSINESS.phoneSecondary}">${BUSINESS.phoneSecondaryDisplay}</a></p>
     </section>
 
     <section class="marquee" aria-label="${esc(h.marqueeAria)}">
