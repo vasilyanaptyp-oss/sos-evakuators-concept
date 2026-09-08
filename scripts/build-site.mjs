@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { LANGS, LANG_META, SERVICES, T, BUSINESS, SERVICE_OG } from "./site-content.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const ASSETS_V = "20260906-hero-map-mobile";
+const ASSETS_V = "20260908-client-media";
 const CONCEPT_BASE = "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
 const PRODUCTION_BASE = "https://autopalidziba.lv";
 const CONCEPT_ROBOTS = "noindex, nofollow";
@@ -325,17 +325,18 @@ function homePage(lang) {
   const galleryTabs = h.work.tabs.map((tab, i) => `        <button class="gallery-tab${i === 0 ? " is-active" : ""}" id="gallery-tab-${i}" type="button" role="tab" aria-selected="${i === 0}" aria-controls="gallery-panel-${i}" tabindex="${i === 0 ? "0" : "-1"}" data-gallery-tab="${i}">${esc(tab)}</button>`).join("\n");
 
   const serviceCardImages = [
-    { img: "fleet-01", cls: "auto", no: "A", sizes: [640, 800, 1200], w: 1600, hh: 1067 },
-    { img: "hero", cls: "truck", no: "B", sizes: [640, 800, 1200], w: 1600, hh: 1200 },
-    { img: "fleet-03", cls: "trailer", no: "C", sizes: [640, 800, 1200], w: 1600, hh: 1067 },
-    { img: "fleet-04", cls: "roadside", no: "D", sizes: [640, 800, 1200], w: 1600, hh: 1067 }
+    { img: "service-auto", cls: "auto", no: "A", sizes: [480, 720, 960], w: 960, hh: 1280 },
+    { img: "service-truck", cls: "truck", no: "B", sizes: [480, 720, 960], w: 960, hh: 1280 },
+    { img: "service-trailer", cls: "trailer", no: "C", sizes: [480, 720, 960], w: 960, hh: 1280 },
+    { img: "service-roadside", cls: "roadside", no: "D", sizes: [480, 720, 960], w: 960, hh: 1280 }
   ];
   const serviceCards = h.services.cards.map((card, i) => {
     const meta = serviceCardImages[i];
     const href = card.link ? serviceHref(card.link) : requestHref;
-    const srcset = [640, 800, 1200].map((s) => `${assetPrefix}assets/images/${meta.img}-${s}.webp ${s}w`).join(", ") + `, ${assetPrefix}assets/images/${meta.img}.webp 1600w`;
+    const srcset = meta.sizes.map((s) => `${assetPrefix}assets/images/${meta.img}-${s}.webp ${s}w`).join(", ");
+    const largest = meta.sizes.at(-1);
     return `        <article class="service-card service-card--photo service-card--${meta.cls}">
-          <img src="${assetPrefix}assets/images/${meta.img}-1200.webp" srcset="${srcset}" sizes="(max-width: 820px) 92vw, 55vw" width="${meta.w}" height="${meta.hh}" alt="${esc(card.alt)}" loading="lazy" decoding="async">
+          <img src="${assetPrefix}assets/images/${meta.img}-${largest}.webp" srcset="${srcset}" sizes="(max-width: 820px) 100vw, 55vw" width="${meta.w}" height="${meta.hh}" alt="${esc(card.alt)}" loading="lazy" decoding="async">
           <div class="photo-shade"></div>
           <div class="card-no">${meta.no}</div>
           <div class="service-card-copy">
@@ -354,6 +355,7 @@ function homePage(lang) {
 
   const form = h.contact.form;
   const issueOptions = form.issues.map((issue) => `          <option>${esc(issue)}</option>`).join("\n");
+  const heroMapAsset = `hero-map-${lang}`;
 
   return `<!doctype html>
 <html lang="${lang}">
@@ -394,7 +396,7 @@ ${mobileMenu(lang, "home", dirSegments)}
           </h1>
           <p class="hero-tagline reveal-item"><span class="accent">${esc(t.hero.taglineAccent)}</span>${esc(t.hero.taglineRest)}</p>
           <figure class="hero-map reveal-item">
-            <img src="${assetPrefix}assets/images/tu-neesi-viens-uz-cela-1080.webp" srcset="${assetPrefix}assets/images/tu-neesi-viens-uz-cela-640.webp 640w, ${assetPrefix}assets/images/tu-neesi-viens-uz-cela-1080.webp 1080w" sizes="(max-width: 820px) 92vw, 560px" width="1080" height="492" alt="${esc(t.hero.mapAlt)}" loading="lazy" decoding="async">
+            <img src="${assetPrefix}assets/images/${heroMapAsset}-1280.webp" srcset="${assetPrefix}assets/images/${heroMapAsset}-640.webp 640w, ${assetPrefix}assets/images/${heroMapAsset}-1280.webp 1280w" sizes="(max-width: 820px) 100vw, 1px" width="1280" height="720" alt="${esc(t.hero.mapAlt)}" loading="lazy" decoding="async">
           </figure>
         </div>
         <div class="hero-cta-row reveal-item">

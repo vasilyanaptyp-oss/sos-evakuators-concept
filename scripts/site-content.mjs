@@ -95,10 +95,10 @@ export const T = {
         p: "Pastāstiet mums, kāda ir jūsu problēma un kur jūs atrodaties. Mēs nosūtīsim pie jums atbilstošu evakuatoru.",
         request: "Pieteikt izsaukumu",
         cards: [
-          { h3: "Auto evakuators", p: "Diennakts autoevakuācija, transportēšana no CSN vietas, ar bloķētām vai bojātām riepām, izvilkšana, bloķēta stūre.", link: "auto", alt: "Evakuators platformā iekrāvis furgonu" },
-          { h3: "Kravas evakuators", p: "Kravas auto, autobusi, smagā tehnika.", link: "kravas", alt: "Kravas evakuators transportē pacēlājus lietū" },
-          { h3: "Treileris", p: "Celtniecības tehnika, būvniecības tehnika, lauksaimniecības tehnika.", link: null, alt: "Treileris transportē tehniku" },
-          { h3: "Diennakts palīdzība uz ceļa", p: "Izvilkšana no grāvja, sniega un dubļiem. Riepu remonts vai maiņa. Piestartēšana. Degvielas pievešana.", link: "cela", alt: "Evakuators iekrauj furgonu uz lauku ceļa" }
+          { h3: "Auto evakuators", p: "Diennakts autoevakuācija, transportēšana no CSN vietas, ar bloķētām vai bojātām riepām, izvilkšana, bloķēta stūre.", link: "auto", alt: "Zaļš minivens uz autoevakuatora platformas Daugavpilī" },
+          { h3: "Kravas evakuators", p: "Kravas auto, autobusi, smagā tehnika.", link: "kravas", alt: "Smagais kravas evakuators uz dubļaina ceļa" },
+          { h3: "Treileris", p: "Celtniecības tehnika, būvniecības tehnika, lauksaimniecības tehnika.", link: null, alt: "Lauksaimniecības traktors uz treilera platformas" },
+          { h3: "Diennakts palīdzība uz ceļa", p: "Izvilkšana no grāvja, sniega un dubļiem. Riepu remonts vai maiņa. Piestartēšana. Degvielas pievešana.", link: "cela", alt: "Riteņa maiņa pelēkai automašīnai" }
         ]
       },
       process: {
@@ -428,10 +428,10 @@ export const T = {
         p: "Расскажите, что произошло и где вы находитесь. Мы вышлем к вам подходящий эвакуатор.",
         request: "Вызвать эвакуатор",
         cards: [
-          { h3: "Автоэвакуатор", p: "Круглосуточная эвакуация легковых авто, транспортировка с места ДТП, эвакуация с заблокированными или повреждёнными колёсами, вытягивание, заблокированный руль.", link: "auto", alt: "Эвакуатор загрузил фургон на платформу" },
-          { h3: "Грузовой эвакуатор", p: "Грузовые авто, автобусы, тяжёлая техника.", link: "kravas", alt: "Грузовой эвакуатор перевозит подъёмники в дождь" },
-          { h3: "Трейлер", p: "Специальная, строительная и сельскохозяйственная техника.", link: null, alt: "Трейлер перевозит технику" },
-          { h3: "Круглосуточная помощь на дороге", p: "Вытягивание из кювета, снега и грязи. Ремонт или замена шин. Прикуривание. Доставка топлива.", link: "cela", alt: "Эвакуатор загружает фургон на сельской дороге" }
+          { h3: "Автоэвакуатор", p: "Круглосуточная эвакуация легковых авто, транспортировка с места ДТП, эвакуация с заблокированными или повреждёнными колёсами, вытягивание, заблокированный руль.", link: "auto", alt: "Зелёный минивен на платформе автоэвакуатора в Даугавпилсе" },
+          { h3: "Грузовой эвакуатор", p: "Грузовые авто, автобусы, тяжёлая техника.", link: "kravas", alt: "Тяжёлый грузовой эвакуатор на грязной дороге" },
+          { h3: "Трейлер", p: "Специальная, строительная и сельскохозяйственная техника.", link: null, alt: "Сельскохозяйственный трактор на платформе трейлера" },
+          { h3: "Круглосуточная помощь на дороге", p: "Вытягивание из кювета, снега и грязи. Ремонт или замена шин. Прикуривание. Доставка топлива.", link: "cela", alt: "Замена колеса на сером автомобиле" }
         ]
       },
       process: {
@@ -761,10 +761,10 @@ export const T = {
         p: "Tell us what happened and where you are. We will send the right tow truck to you.",
         request: "Request a tow",
         cards: [
-          { h3: "Car towing", p: "Around-the-clock car towing, transport from an accident scene, towing with blocked or damaged wheels, vehicle recovery, locked steering.", link: "auto", alt: "Tow truck with a van loaded on its platform" },
-          { h3: "Truck towing", p: "Trucks, buses, heavy machinery.", link: "kravas", alt: "Heavy tow truck carrying scissor lifts in the rain" },
-          { h3: "Trailer transport", p: "Construction, heavy and agricultural machinery.", link: null, alt: "Trailer transporting machinery" },
-          { h3: "24/7 roadside assistance", p: "Recovery from ditches, snow and mud. Tyre repair or replacement. Jump start. Fuel delivery.", link: "cela", alt: "Tow truck loading a van on a rural road" }
+          { h3: "Car towing", p: "Around-the-clock car towing, transport from an accident scene, towing with blocked or damaged wheels, vehicle recovery, locked steering.", link: "auto", alt: "Green minivan loaded on a tow-truck platform in Daugavpils" },
+          { h3: "Truck towing", p: "Trucks, buses, heavy machinery.", link: "kravas", alt: "Heavy tow truck on a muddy road" },
+          { h3: "Trailer transport", p: "Construction, heavy and agricultural machinery.", link: null, alt: "Agricultural tractor secured on a trailer platform" },
+          { h3: "24/7 roadside assistance", p: "Recovery from ditches, snow and mud. Tyre repair or replacement. Jump start. Fuel delivery.", link: "cela", alt: "Roadside wheel change on a grey car" }
         ]
       },
       process: {
