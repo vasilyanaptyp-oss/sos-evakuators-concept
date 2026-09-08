@@ -44,7 +44,7 @@ export const T = {
     langAria: "Valodas",
     hero: {
       eyebrow: "Daugavpilī, visā Latvijā un Eiropā.",
-      h1a: "00 – 24 Evakuators",
+      h1a: "00‑24 Evakuators",
       h1b: "Daugavpils",
       taglineAccent: "Ceļš apstājās?",
       taglineRest: " Mēs jau braucam pie jums!",
@@ -377,7 +377,7 @@ export const T = {
     langAria: "Языки",
     hero: {
       eyebrow: "Даугавпилс, вся Латвия и Европа.",
-      h1a: "00 – 24 Эвакуатор",
+      h1a: "00‑24 Эвакуатор",
       h1b: "в Даугавпилсе",
       taglineAccent: "Поездка прервалась?",
       taglineRest: " Мы уже едем к вам!",
@@ -710,7 +710,7 @@ export const T = {
     langAria: "Languages",
     hero: {
       eyebrow: "Daugavpils, all of Latvia and Europe.",
-      h1a: "00 – 24 Tow Truck",
+      h1a: "00‑24 Tow Truck",
       h1b: "in Daugavpils",
       taglineAccent: "Trip cut short?",
       taglineRest: " We're already on our way!",
