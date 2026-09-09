@@ -15,6 +15,11 @@ const CONCEPT_ROBOTS = "noindex, nofollow";
 const PRODUCTION_ROBOTS = "index, follow";
 const LASTMOD = "2026-09-09";
 const MENU_OPEN = { lv: "Atvērt izvēlni", ru: "Открыть меню", en: "Open menu" };
+const ADDITIONAL_SERVICES_DIR = {
+  lv: ["citi-pakalpojumi"],
+  ru: ["ru", "drugie-uslugi"],
+  en: ["en", "other-services"]
+};
 
 const production = process.argv.includes("--production");
 const BASE = production ? PRODUCTION_BASE : CONCEPT_BASE;
@@ -168,7 +173,7 @@ function header(lang, page, dirSegments) {
     ? "#sakums"
     : rel(dirSegments, dirOf(lang, "home"));
   const anchor = (hash) => (page === "home" ? `#${hash}` : `${rel(dirSegments, dirOf(lang, "home"))}#${hash}`);
-  const citiHref = rel(dirSegments, ["citi-pakalpojumi"]);
+  const citiHref = rel(dirSegments, ADDITIONAL_SERVICES_DIR[lang]);
   const assetPrefix = rel(dirSegments, []);
   const langLinks = LANGS.map((l) => {
     const current = l === lang;
@@ -213,7 +218,7 @@ function header(lang, page, dirSegments) {
 function mobileMenu(lang, page, dirSegments) {
   const t = T[lang];
   const anchor = (hash) => (page === "home" ? `#${hash}` : `${rel(dirSegments, dirOf(lang, "home"))}#${hash}`);
-  const citiHref = rel(dirSegments, ["citi-pakalpojumi"]);
+  const citiHref = rel(dirSegments, ADDITIONAL_SERVICES_DIR[lang]);
   const serviceLink = (key, label) => {
     const href = page === key ? undefined : rel(dirSegments, dirOf(lang, key));
     return `<a${href ? ` href="${href}"` : ' aria-current="page"'}>${esc(label)}</a>`;
