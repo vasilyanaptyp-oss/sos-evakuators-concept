@@ -969,7 +969,10 @@ function cms_delete_upload(string $name): void
 function cms_change_password(string $current, string $next): void
 {
     $config = cms_auth_config();
-    if (!cms_verify_password($current, $config)) {
+    $username = (string) ($_SESSION['cms_user'] ?? '');
+    $users = cms_auth_users($config);
+    $userConfig = isset($users[$username]) && is_array($users[$username]) ? $users[$username] : [];
+    if ($username === '' || !cms_verify_password($current, $userConfig)) {
         throw new InvalidArgumentException('Pašreizējā parole nav pareiza.');
     }
     if (strlen($next) < 12) {
@@ -977,11 +980,14 @@ function cms_change_password(string $current, string $next): void
     }
     $salt = bin2hex(random_bytes(24));
     $iterations = 210000;
-    cms_write_json(CMS_STORAGE . DIRECTORY_SEPARATOR . 'auth.json', [
-        'username' => (string) ($config['username'] ?? 'admin'),
+    $users[$username] = array_merge($userConfig, [
         'salt' => $salt,
         'iterations' => $iterations,
         'hash' => hash_pbkdf2('sha256', $next, $salt, $iterations, 64, false),
+        'updated_at' => date(DATE_ATOM),
+    ]);
+    cms_write_json(CMS_STORAGE . DIRECTORY_SEPARATOR . 'auth.json', [
+        'users' => $users,
         'updated_at' => date(DATE_ATOM),
     ]);
 }

@@ -89,6 +89,20 @@ function cms_auth_config(): array
     return cms_read_json(CMS_STORAGE . DIRECTORY_SEPARATOR . 'auth.json');
 }
 
+function cms_auth_users(array $config): array
+{
+    if (isset($config['users']) && is_array($config['users'])) {
+        return $config['users'];
+    }
+
+    // Backwards compatibility with the original single-user config.
+    if (!empty($config['username'])) {
+        return [(string) $config['username'] => $config];
+    }
+
+    return [];
+}
+
 function cms_is_authenticated(): bool
 {
     return !empty($_SESSION['cms_authenticated'])
@@ -164,8 +178,24 @@ function cms_login(string $username, string $password): bool
         return false;
     }
     $config = cms_auth_config();
-    $validUser = hash_equals((string) ($config['username'] ?? ''), trim($username));
-    if (!$validUser || !cms_verify_password($password, $config)) {
+    $submittedUsername = trim($username);
+    $matchedUsername = '';
+    $matchedConfig = null;
+    foreach (cms_auth_users($config) as $storedUsername => $storedConfig) {
+        if (is_array($storedConfig) && hash_equals((string) $storedUsername, $submittedUsername)) {
+            $matchedUsername = (string) $storedUsername;
+            $matchedConfig = $storedConfig;
+        }
+    }
+
+    // Verify a dummy hash for unknown users so username checks do not become a
+    // cheap account-enumeration oracle.
+    $verifyConfig = $matchedConfig ?? [
+        'salt' => 'c29zLWV2YWt1YXRvcnMtZHVtbXktc2FsdA',
+        'iterations' => 210000,
+        'hash' => 'fe9cbc1f7a77e2bf5becedbc6c43cb916220f391b8cc0ac1a49749657b1aad85',
+    ];
+    if ($matchedConfig === null || !cms_verify_password($password, $verifyConfig)) {
         cms_record_login_failure();
         usleep(350000);
         return false;
@@ -173,7 +203,7 @@ function cms_login(string $username, string $password): bool
     cms_clear_login_failures();
     session_regenerate_id(true);
     $_SESSION['cms_authenticated'] = true;
-    $_SESSION['cms_user'] = (string) $config['username'];
+    $_SESSION['cms_user'] = $matchedUsername;
     $_SESSION['cms_last_seen'] = time();
     $_SESSION['cms_csrf'] = bin2hex(random_bytes(24));
     return true;
@@ -258,4 +288,3 @@ function cms_normalize_page(string $page): string
 }
 
 cms_start_session();
-
