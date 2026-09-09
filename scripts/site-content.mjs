@@ -16,9 +16,11 @@ export const LANG_META = {
 export const SERVICES = [
   { key: "auto", slug: { lv: "autoevakuators", ru: "avtoevakuator", en: "tow-truck" } },
   { key: "kravas", slug: { lv: "kravas-evakuators", ru: "gruzovoj-evakuator", en: "heavy-towing" } },
+  { key: "treileris", slug: { lv: "treileris", ru: "trejler", en: "trailer-transport" } },
   { key: "cela", slug: { lv: "palidziba-uz-cela", ru: "pomosh-na-doroge", en: "roadside-assistance" } },
   { key: "izvilkshana", slug: { lv: "auto-izvilkshana", ru: "vytyagivanie-avto", en: "vehicle-recovery" } },
-  { key: "latgale", slug: { lv: "evakuators-latgale", ru: "evakuator-latgaliya", en: "tow-truck-latgale" } }
+  { key: "latgale", slug: { lv: "evakuators-latgale", ru: "evakuator-latgaliya", en: "tow-truck-latgale" } },
+  { key: "manipulators", slug: { lv: "automanipulatora-darbi", ru: "uslugi-avtomanipulyatora", en: "truck-mounted-crane-services" } }
 ];
 
 export const T = {
@@ -97,7 +99,7 @@ export const T = {
         cards: [
           { h3: "Auto evakuators", p: "Diennakts autoevakuācija, transportēšana no CSN vietas, ar bloķētām vai bojātām riepām, izvilkšana, bloķēta stūre.", link: "auto", alt: "Zaļš minivens uz autoevakuatora platformas Daugavpilī" },
           { h3: "Kravas evakuators", p: "Kravas auto, autobusi, smagā tehnika.", link: "kravas", alt: "Smagais kravas evakuators uz dubļaina ceļa" },
-          { h3: "Treileris", p: "Celtniecības tehnika, būvniecības tehnika, lauksaimniecības tehnika.", link: null, alt: "Lauksaimniecības traktors uz treilera platformas" },
+          { h3: "Treileris", p: "Celtniecības tehnika, būvniecības tehnika, lauksaimniecības tehnika.", link: "treileris", alt: "Lauksaimniecības traktors uz treilera platformas" },
           { h3: "Diennakts palīdzība uz ceļa", p: "Izvilkšana no grāvja, sniega un dubļiem. Riepu remonts vai maiņa. Piestartēšana. Degvielas pievešana.", link: "cela", alt: "Riteņa maiņa pelēkai automašīnai" }
         ]
       },
@@ -130,8 +132,8 @@ export const T = {
       work: {
         eyebrow: "Reāli izsaukumi",
         h2: "Mūsu darbi",
-        tabs: ["Autoevakuators", "Kravas evakuators", "Treileris", "Palīdzība uz ceļa"],
-        alts: ["Autoevakuators darbā", "Kravas evakuators darbā", "Treileris transportē tehniku", "Palīdzība uz ceļa"]
+        tabs: ["Autoevakuators", "Kravas evakuators", "Treileris", "Palīdzība uz ceļa", "Auto izvilkšana", "Automanipulatora darbi"],
+        alts: ["Autoevakuators transportē vieglo automašīnu", "Kravas evakuators darbā", "Treileris transportē pacēlāju", "Riepas maiņa uz ceļa", "Auto izvilkšana no grāvja un sniega", "Automanipulatora celšanas un transportēšanas darbi"]
       },
       reviews: {
         eyebrow: "Google atsauksmes",
@@ -191,8 +193,8 @@ export const T = {
           includes: ["Transportēšana no CSN vietas", "Evakuācija ar bojātām vai bloķētām riepām", "Evakuācija ar bloķētu stūri", "Izvilkšana no grāvja, sniega un dubļiem", "Motociklu un kvadraciklu evakuācija", "Transportēšana uz servisu vai citu adresi"],
           photosH2: "No darbiem",
           photos: [
-            { img: "fleet-01", alt: "Autoevakuators platformā iekrāvis furgonu", caption: "Auto evakuācija ar platformu" },
-            { img: "client-collage-auto", alt: "Auto evakuācijas darbu kolāža", caption: "Reāli izsaukumi" }
+            { img: "client-auto-audi", alt: "Sarkana vieglā automašīna uz dzeltena autoevakuatora", caption: "Vieglā auto evakuācija" },
+            { img: "client-auto-van", alt: "Zaļš furgons uz dzeltena autoevakuatora Daugavpilī", caption: "Furgona transportēšana" }
           ],
           stepsH2: "Kā norit izsaukums",
           steps: [
@@ -227,8 +229,8 @@ export const T = {
           includes: ["Kravas auto un vilcēji", "Autobusi un maxi busi", "Būvniecības un celtniecības tehnika", "Lauksaimniecības tehnika", "Pacēlāji un specializētā tehnika", "Smagās tehnikas izvilkšana no grūti pieejamām vietām"],
           photosH2: "No darbiem",
           photos: [
-            { img: "hero", alt: "Kravas evakuators transportē pacēlājus lietū", caption: "Pacēlāju transportēšana" },
-            { img: "fleet-02", alt: "Smagais kravas evakuators pie kravas auto", caption: "Smagās tehnikas evakuācija" }
+            { img: "client-kravas-heavy", alt: "Sarkans kravas evakuators sniegā", caption: "Kravas evakuators" },
+            { img: "client-kravas-mud", alt: "Smagais kravas evakuators uz lauku ceļa", caption: "Smagās tehnikas evakuācija" }
           ],
           stepsH2: "Kā norit izsaukums",
           steps: [
@@ -243,6 +245,42 @@ export const T = {
           priceLink: "Noskaidrot cenu",
           relatedH2: "Citi evakuatora pakalpojumi",
           cta: { h2: "Nepieciešams kravas evakuators?", p: "Zvaniet — atbildam diennakti, arī brīvdienās un svētku dienās." }
+        }
+      },
+      treileris: {
+        title: "Treileris Daugavpilī | Tehnikas transportēšana 00–24",
+        description: "Treilera pakalpojumi Daugavpilī un Latgalē: smagās, būvniecības, celtniecības un lauksaimniecības tehnikas evakuācija un transportēšana. Zvani +371 22002700.",
+        h1: "Treileris Daugavpilī",
+        tagline: "Smagās, būvniecības un lauksaimniecības tehnikas evakuācija un transportēšana.",
+        breadcrumb: "Treileris",
+        heroEyebrow: "Daugavpilī, Latgalē un visā Latvijā",
+        availability: "Izsaukumi diennakti",
+        sections: {
+          about: {
+            h2: "Treileris tehnikai, kuru nevar vest savā gaitā.",
+            lead: "Nogādājam smago un specializēto tehniku uz objektu, servisu vai citu norādīto vietu.",
+            p: "Treilera pakalpojumi pieejami Daugavpilī, Latgalē un maršrutos visā Latvijā. Pirms izbraukšanas noskaidrojam tehnikas veidu, izmērus, atrašanās vietu un galamērķi."
+          },
+          includesH2: "Ko pārvadājam ar treileri",
+          includes: ["Būvniecības un celtniecības tehnika", "Lauksaimniecības tehnika", "Pacēlāji un specializētā tehnika", "Smagā tehnika", "Tehnikas nogādāšana uz objektu vai servisu", "Transportēšana starp pilsētām"],
+          photosH2: "No darbiem",
+          photos: [
+            { img: "client-treiler-lift", alt: "Dzeltenais pacēlājs uz sarkana treilera", caption: "Pacēlāja transportēšana" },
+            { img: "client-treiler-tractor", alt: "Lauksaimniecības traktors uz treilera platformas", caption: "Lauksaimniecības tehnikas transportēšana" }
+          ],
+          stepsH2: "Kā norit pasūtījums",
+          steps: [
+            { h3: "Nosauciet tehniku un vietu", p: "Pastāstiet, kas jāpārvadā, kur tehnika atrodas un kur tā jānogādā." },
+            { h3: "Saskaņojam darbu un cenu", p: "Cenu nosaka maršruts, tehnikas izmēri un iekraušanas apstākļi." },
+            { h3: "Iekraujam un transportējam", p: "Nostiprinām tehniku un nogādājam norādītajā vietā." }
+          ],
+          priceH2: "Cena",
+          price: { label: "Treilera pakalpojumi", from: "", price: "pēc situācijas", per: "Cenu nosaka maršruts, tehnika un iekraušanas apstākļi", note: "Precīzu cenu noskaidrosiet pa tālruni — zvaniet." },
+          factorsH3: "Precīzu cenu nosaka",
+          factors: ["attālums un galamērķis", "tehnikas veids un izmēri", "piebraukšanas iespējas", "iekraušanas un nostiprināšanas darbi", "izsaukuma laiks"],
+          priceLink: "Noskaidrot cenu",
+          relatedH2: "Citi evakuatora pakalpojumi",
+          cta: { h2: "Jāpārvadā smagā tehnika?", p: "Zvaniet un nosauciet tehnikas veidu, atrašanās vietu un galamērķi." }
         }
       },
       cela: {
@@ -263,7 +301,7 @@ export const T = {
           includes: ["Izvilkšana no grāvja, sniega un dubļiem", "Riepu remonts vai maiņa", "Piestartēšana ar izlādējušos akumulatoru", "Degvielas pievešana", "Evakuācija, ja uz vietas iztikt neizdodas"],
           photosH2: "No darbiem",
           photos: [
-            { img: "fleet-04", alt: "Evakuators iekrauj furgonu uz lauku ceļa", caption: "Izbraukums ārpus pilsētas" }
+            { img: "client-roadside-wheel", alt: "Pelēkai automašīnai tiek mainīts ritenis uz ceļa", caption: "Riteņa maiņa uz ceļa" }
           ],
           stepsH2: "Kā norit izsaukums",
           steps: [
@@ -298,8 +336,8 @@ export const T = {
           includes: ["Izvilkšana no grāvja", "Izvilkšana no sniega", "Izvilkšana no dubļiem un smiltīm", "Vieglā auto un smagās tehnikas izvilkšana", "Tālāka transportēšana pēc izvilkšanas"],
           photosH2: "No darbiem",
           photos: [
-            { img: "fleet-05", alt: "Smagais evakuators izvelk tehniku no dubļainā ceļa", caption: "Izvilkšana uz lauku ceļa" },
-            { img: "fleet-04", alt: "Evakuators iekrauj furgonu uz lauku ceļa", caption: "Iekraušana pēc izvilkšanas" }
+            { img: "client-recovery-collage", alt: "Automanipulators izvelk automašīnas no grāvja un sniega", caption: "Izvilkšana dažādos apstākļos" },
+            { img: "client-kravas-mud", alt: "Smagais evakuators strādā uz dubļaina lauku ceļa", caption: "Smagās tehnikas izvilkšana" }
           ],
           stepsH2: "Kā norit izsaukums",
           steps: [
@@ -334,8 +372,14 @@ export const T = {
           includes: ["Autoevakuators", "Kravas evakuators", "Palīdzība uz ceļa", "Auto izvilkšana", "Tehnikas transportēšana starp pilsētām"],
           photosH2: "No darbiem",
           photos: [
-            { img: "fleet-03", alt: "Treileris ar tehniku uz lauku ceļa", caption: "Tehnikas transportēšana reģionā" },
-            { img: "fleet-01", alt: "Autoevakuators platformā iekrāvis furgonu", caption: "Izsaukums diennakti" }
+            { img: "client-auto-audi", alt: "Autoevakuators ar vieglo automašīnu Latgalē", caption: "Autoevakuators" },
+            { img: "client-kravas-heavy", alt: "Kravas evakuators ziemas apstākļos", caption: "Kravas evakuators" },
+            { img: "client-treiler-lift", alt: "Pacēlājs uz treilera platformas", caption: "Treilera pakalpojumi" },
+            { img: "client-roadside-wheel", alt: "Riteņa maiņa uz ceļa", caption: "Palīdzība uz ceļa" },
+            { img: "client-recovery-collage", alt: "Auto izvilkšana no grāvja un sniega", caption: "Auto izvilkšana" },
+            { img: "client-auto-van", alt: "Furgons uz autoevakuatora platformas", caption: "Transportēšana Latgalē" },
+            { img: "client-treiler-tractor", alt: "Traktors uz treilera", caption: "Lauksaimniecības tehnika" },
+            { img: "client-manipulator-collage", alt: "Automanipulatora darbi Daugavpilī un Latgalē", caption: "Automanipulatora darbi" }
           ],
           stepsH2: "Kā norit izsaukums",
           steps: [
@@ -350,6 +394,46 @@ export const T = {
           priceLink: "Noskaidrot cenu",
           relatedH2: "Citi evakuatora pakalpojumi",
           cta: { h2: "Vajag evakuatoru Latgalē?", p: "Zvaniet — atbildam diennakti, arī brīvdienās un svētku dienās." }
+        }
+      },
+      manipulators: {
+        title: "Automanipulatora darbi Daugavpilī un Latgalē",
+        description: "Automanipulatora un autoceltņa pakalpojumi Daugavpilī un Latgalē: auto nogādāšana utilizācijai, būvmateriālu un pirts ēku pārvadāšana, celšanas darbi. Zvani +371 22002700.",
+        h1: "Automanipulatora darbi Daugavpilī",
+        tagline: "Celšanas, iekraušanas un pārvadāšanas darbi Daugavpilī un visā Latgalē.",
+        breadcrumb: "Automanipulatora darbi",
+        heroEyebrow: "Daugavpils un Latgale",
+        availability: "Izsaukumi diennakti",
+        sections: {
+          about: {
+            h2: "Autoceltnis un manipulators vienā izsaukumā.",
+            lead: "Paceļam, iekraujam un nogādājam auto, būvmateriālus un citas kravas.",
+            p: "Strādājam Daugavpilī un Latgalē, tostarp Krāslavā, Preiļos, Līvānos, Rēzeknē un Ilūkstē. Pirms izbraukšanas saskaņojam kravas veidu, piekļuvi, pacelšanas apstākļus un galamērķi."
+          },
+          includesH2: "Ko varam paveikt",
+          includes: ["Autoceltņa un manipulatora darbi", "Auto nogādāšana utilizācijai", "Būvmateriālu iekraušana un pārvadāšana", "Pirts ēku pārvadāšana", "Kravu pacelšana un novietošana", "Pārvadājumi Daugavpilī un Latgalē"],
+          photosH2: "Automanipulators darbā",
+          photos: [
+            { img: "client-manipulator-01", alt: "Automanipulators izvelk automašīnu no grāvja", caption: "Auto izcelšana no grāvja" },
+            { img: "client-manipulator-02", alt: "Automanipulators izvelk automašīnu sniegā", caption: "Darbs ziemas apstākļos" },
+            { img: "client-manipulator-03", alt: "Automanipulators paceļ bojātu automašīnu", caption: "Bojāta auto iekraušana" },
+            { img: "client-manipulator-04", alt: "Automanipulators pārvieto lielgabarīta kravu", caption: "Kravas pacelšana" },
+            { img: "client-manipulator-05", alt: "Automanipulators iekrauj automašīnu", caption: "Auto iekraušana" },
+            { img: "client-manipulator-06", alt: "Automanipulators nogādā auto utilizācijai", caption: "Auto nogādāšana utilizācijai" }
+          ],
+          stepsH2: "Kā pieteikt darbu",
+          steps: [
+            { h3: "Pastāstiet par kravu", p: "Nosauciet, ko vajag pacelt vai pārvadāt, kā arī atrašanās vietu." },
+            { h3: "Saskaņojam piekļuvi un cenu", p: "Cenu nosaka maršruts, krava, pacelšanas apstākļi un darba apjoms." },
+            { h3: "Paceļam un nogādājam", p: "Veicam saskaņotos celšanas, iekraušanas un pārvadāšanas darbus." }
+          ],
+          priceH2: "Cena",
+          price: { label: "Automanipulatora darbi", from: "", price: "pēc situācijas", per: "Cenu nosaka krava, maršruts un darba apjoms", note: "Precīzu cenu noskaidrosiet pa tālruni — zvaniet." },
+          factorsH3: "Precīzu cenu nosaka",
+          factors: ["kravas veids un izmēri", "pacelšanas apstākļi", "piebraukšanas iespējas", "attālums un galamērķis", "darba apjoms"],
+          priceLink: "Noskaidrot cenu",
+          relatedH2: "Citi evakuatora pakalpojumi",
+          cta: { h2: "Vajadzīgs automanipulators?", p: "Zvaniet un pastāstiet, ko vajag pacelt vai nogādāt." }
         }
       }
     }
@@ -430,7 +514,7 @@ export const T = {
         cards: [
           { h3: "Автоэвакуатор", p: "Круглосуточная эвакуация легковых авто, транспортировка с места ДТП, эвакуация с заблокированными или повреждёнными колёсами, вытягивание, заблокированный руль.", link: "auto", alt: "Зелёный минивен на платформе автоэвакуатора в Даугавпилсе" },
           { h3: "Грузовой эвакуатор", p: "Грузовые авто, автобусы, тяжёлая техника.", link: "kravas", alt: "Тяжёлый грузовой эвакуатор на грязной дороге" },
-          { h3: "Трейлер", p: "Специальная, строительная и сельскохозяйственная техника.", link: null, alt: "Сельскохозяйственный трактор на платформе трейлера" },
+          { h3: "Трейлер", p: "Специальная, строительная и сельскохозяйственная техника.", link: "treileris", alt: "Сельскохозяйственный трактор на платформе трейлера" },
           { h3: "Круглосуточная помощь на дороге", p: "Вытягивание из кювета, снега и грязи. Ремонт или замена шин. Прикуривание. Доставка топлива.", link: "cela", alt: "Замена колеса на сером автомобиле" }
         ]
       },
@@ -463,8 +547,8 @@ export const T = {
       work: {
         eyebrow: "Реальные вызовы",
         h2: "Наши работы",
-        tabs: ["Автоэвакуатор", "Грузовой эвакуатор", "Трейлер", "Помощь на дороге"],
-        alts: ["Автоэвакуатор в работе", "Грузовой эвакуатор в работе", "Трейлер перевозит технику", "Помощь на дороге"]
+        tabs: ["Автоэвакуатор", "Грузовой эвакуатор", "Трейлер", "Помощь на дороге", "Вытягивание авто", "Работы автоманипулятора"],
+        alts: ["Автоэвакуатор перевозит легковой автомобиль", "Грузовой эвакуатор в работе", "Трейлер перевозит подъёмник", "Замена колеса на дороге", "Вытягивание автомобиля из кювета и снега", "Подъёмные и транспортные работы автоманипулятора"]
       },
       reviews: {
         eyebrow: "Отзывы Google",
@@ -524,8 +608,8 @@ export const T = {
           includes: ["Транспортировка с места ДТП", "Эвакуация с повреждёнными или заблокированными колёсами", "Эвакуация с заблокированным рулём", "Вытягивание из кювета, снега и грязи", "Эвакуация мотоциклов и квадроциклов", "Доставка на сервис или по другому адресу"],
           photosH2: "Из работ",
           photos: [
-            { img: "fleet-01", alt: "Автоэвакуатор загрузил фургон на платформу", caption: "Эвакуация с платформой" },
-            { img: "client-collage-auto", alt: "Коллаж из работ по эвакуации легковых авто", caption: "Реальные вызовы" }
+            { img: "client-auto-audi", alt: "Красный легковой автомобиль на жёлтом автоэвакуаторе", caption: "Эвакуация легкового авто" },
+            { img: "client-auto-van", alt: "Зелёный фургон на жёлтом автоэвакуаторе в Даугавпилсе", caption: "Перевозка фургона" }
           ],
           stepsH2: "Как проходит вызов",
           steps: [
@@ -560,8 +644,8 @@ export const T = {
           includes: ["Грузовые авто и тягачи", "Автобусы и maxi-фургоны", "Строительная и специальная техника", "Сельскохозяйственная техника", "Подъёмники и специализированная техника", "Вытягивание тяжёлой техники из труднодоступных мест"],
           photosH2: "Из работ",
           photos: [
-            { img: "hero", alt: "Грузовой эвакуатор перевозит подъёмники в дождь", caption: "Перевозка подъёмников" },
-            { img: "fleet-02", alt: "Тяжёлый эвакуатор у грузового авто", caption: "Эвакуация тяжёлой техники" }
+            { img: "client-kravas-heavy", alt: "Красный грузовой эвакуатор в снегу", caption: "Грузовой эвакуатор" },
+            { img: "client-kravas-mud", alt: "Тяжёлый грузовой эвакуатор на сельской дороге", caption: "Эвакуация тяжёлой техники" }
           ],
           stepsH2: "Как проходит вызов",
           steps: [
@@ -576,6 +660,42 @@ export const T = {
           priceLink: "Уточнить цену",
           relatedH2: "Другие услуги эвакуатора",
           cta: { h2: "Нужен грузовой эвакуатор?", p: "Звоните — отвечаем круглосуточно, включая выходные и праздники." }
+        }
+      },
+      treileris: {
+        title: "Трейлер в Даугавпилсе | Перевозка техники 00–24",
+        description: "Услуги трейлера в Даугавпилсе и Латгалии: эвакуация и перевозка тяжёлой, строительной, специальной и сельскохозяйственной техники. Звоните +371 22002700.",
+        h1: "Трейлер в Даугавпилсе",
+        tagline: "Эвакуация и перевозка тяжёлой, строительной и сельскохозяйственной техники.",
+        breadcrumb: "Трейлер",
+        heroEyebrow: "Даугавпилс, Латгалия и вся Латвия",
+        availability: "Вызовы круглосуточно",
+        sections: {
+          about: {
+            h2: "Трейлер для техники, которая не может ехать своим ходом.",
+            lead: "Доставляем тяжёлую и специальную технику на объект, в сервис или по другому указанному адресу.",
+            p: "Услуги трейлера доступны в Даугавпилсе, Латгалии и на маршрутах по всей Латвии. Перед выездом уточняем тип и размеры техники, место загрузки и пункт назначения."
+          },
+          includesH2: "Что перевозим на трейлере",
+          includes: ["Строительная и специальная техника", "Сельскохозяйственная техника", "Подъёмники и специализированная техника", "Тяжёлая техника", "Доставка техники на объект или в сервис", "Перевозка между городами"],
+          photosH2: "Из работ",
+          photos: [
+            { img: "client-treiler-lift", alt: "Жёлтый подъёмник на красном трейлере", caption: "Перевозка подъёмника" },
+            { img: "client-treiler-tractor", alt: "Сельскохозяйственный трактор на платформе трейлера", caption: "Перевозка сельскохозяйственной техники" }
+          ],
+          stepsH2: "Как проходит заказ",
+          steps: [
+            { h3: "Назовите технику и место", p: "Расскажите, что нужно перевезти, где техника находится и куда её доставить." },
+            { h3: "Согласуем работу и цену", p: "Цену определяют маршрут, размеры техники и условия загрузки." },
+            { h3: "Загружаем и перевозим", p: "Закрепляем технику и доставляем по указанному адресу." }
+          ],
+          priceH2: "Цена",
+          price: { label: "Услуги трейлера", from: "", price: "по ситуации", per: "Цену определяют маршрут, техника и условия загрузки", note: "Точную цену назовём по телефону — звоните." },
+          factorsH3: "Точную цену определяют",
+          factors: ["расстояние и пункт назначения", "тип и размеры техники", "возможность подъезда", "работы по загрузке и креплению", "время вызова"],
+          priceLink: "Уточнить цену",
+          relatedH2: "Другие услуги эвакуатора",
+          cta: { h2: "Нужно перевезти тяжёлую технику?", p: "Позвоните и назовите тип техники, место загрузки и пункт назначения." }
         }
       },
       cela: {
@@ -596,7 +716,7 @@ export const T = {
           includes: ["Вытягивание из кювета, снега и грязи", "Ремонт или замена шин", "Прикуривание при разряженном аккумуляторе", "Доставка топлива", "Эвакуация, если на месте решить не удаётся"],
           photosH2: "Из работ",
           photos: [
-            { img: "fleet-04", alt: "Эвакуатор загружает фургон на сельской дороге", caption: "Выезд за город" }
+            { img: "client-roadside-wheel", alt: "Замена колеса у серого автомобиля на дороге", caption: "Замена колеса на дороге" }
           ],
           stepsH2: "Как проходит вызов",
           steps: [
@@ -631,8 +751,8 @@ export const T = {
           includes: ["Вытягивание из кювета", "Вытягивание из снега", "Вытягивание из грязи и песка", "Вытягивание легковых авто и тяжёлой техники", "Дальнейшая транспортировка после вытягивания"],
           photosH2: "Из работ",
           photos: [
-            { img: "fleet-05", alt: "Тяжёлый эвакуатор вытягивает технику из грязной дороги", caption: "Вытягивание на сельской дороге" },
-            { img: "fleet-04", alt: "Эвакуатор загружает фургон на сельской дороге", caption: "Погрузка после вытягивания" }
+            { img: "client-recovery-collage", alt: "Автоманипулятор вытягивает автомобили из кювета и снега", caption: "Вытягивание в разных условиях" },
+            { img: "client-kravas-mud", alt: "Тяжёлый эвакуатор работает на грязной сельской дороге", caption: "Вытягивание тяжёлой техники" }
           ],
           stepsH2: "Как проходит вызов",
           steps: [
@@ -667,8 +787,14 @@ export const T = {
           includes: ["Автоэвакуатор", "Грузовой эвакуатор", "Помощь на дороге", "Вытягивание авто", "Транспортировка техники между городами"],
           photosH2: "Из работ",
           photos: [
-            { img: "fleet-03", alt: "Трейлер с техникой на сельской дороге", caption: "Транспортировка техники по региону" },
-            { img: "fleet-01", alt: "Автоэвакуатор загрузил фургон на платформу", caption: "Вызовы круглосуточно" }
+            { img: "client-auto-audi", alt: "Автоэвакуатор с легковым автомобилем в Латгалии", caption: "Автоэвакуатор" },
+            { img: "client-kravas-heavy", alt: "Грузовой эвакуатор в зимних условиях", caption: "Грузовой эвакуатор" },
+            { img: "client-treiler-lift", alt: "Подъёмник на платформе трейлера", caption: "Услуги трейлера" },
+            { img: "client-roadside-wheel", alt: "Замена колеса на дороге", caption: "Помощь на дороге" },
+            { img: "client-recovery-collage", alt: "Вытягивание автомобиля из кювета и снега", caption: "Вытягивание авто" },
+            { img: "client-auto-van", alt: "Фургон на платформе автоэвакуатора", caption: "Перевозка по Латгалии" },
+            { img: "client-treiler-tractor", alt: "Трактор на трейлере", caption: "Сельскохозяйственная техника" },
+            { img: "client-manipulator-collage", alt: "Работы автоманипулятора в Даугавпилсе и Латгалии", caption: "Работы автоманипулятора" }
           ],
           stepsH2: "Как проходит вызов",
           steps: [
@@ -683,6 +809,46 @@ export const T = {
           priceLink: "Уточнить цену",
           relatedH2: "Другие услуги эвакуатора",
           cta: { h2: "Нужен эвакуатор в Латгалии?", p: "Звоните — отвечаем круглосуточно, включая выходные и праздники." }
+        }
+      },
+      manipulators: {
+        title: "Работы автоманипулятора в Даугавпилсе и Латгалии",
+        description: "Услуги автоманипулятора и автокрана в Даугавпилсе и Латгалии: вывоз авто на утилизацию, перевозка стройматериалов и бань, подъёмные работы. Звоните +371 22002700.",
+        h1: "Работы автоманипулятора в Даугавпилсе",
+        tagline: "Подъёмные, погрузочные и транспортные работы в Даугавпилсе и по всей Латгалии.",
+        breadcrumb: "Работы автоманипулятора",
+        heroEyebrow: "Даугавпилс и Латгалия",
+        availability: "Вызовы круглосуточно",
+        sections: {
+          about: {
+            h2: "Автокран и манипулятор в одном выезде.",
+            lead: "Поднимаем, загружаем и перевозим автомобили, строительные материалы и другие грузы.",
+            p: "Работаем в Даугавпилсе и Латгалии, включая Краславу, Прейли, Ливаны, Резекне и Илуксте. Перед выездом согласуем тип груза, доступ к нему, условия подъёма и пункт назначения."
+          },
+          includesH2: "Что можем сделать",
+          includes: ["Работы автокрана и манипулятора", "Вывоз автомобилей на утилизацию", "Погрузка и перевозка строительных материалов", "Перевозка бань", "Подъём и установка грузов", "Перевозки по Даугавпилсу и Латгалии"],
+          photosH2: "Автоманипулятор в работе",
+          photos: [
+            { img: "client-manipulator-01", alt: "Автоманипулятор вытягивает автомобиль из кювета", caption: "Подъём автомобиля из кювета" },
+            { img: "client-manipulator-02", alt: "Автоманипулятор вытягивает автомобиль в снегу", caption: "Работа в зимних условиях" },
+            { img: "client-manipulator-03", alt: "Автоманипулятор поднимает повреждённый автомобиль", caption: "Погрузка повреждённого авто" },
+            { img: "client-manipulator-04", alt: "Автоманипулятор перемещает крупный груз", caption: "Подъём груза" },
+            { img: "client-manipulator-05", alt: "Автоманипулятор загружает автомобиль", caption: "Погрузка автомобиля" },
+            { img: "client-manipulator-06", alt: "Автоманипулятор доставляет автомобиль на утилизацию", caption: "Вывоз авто на утилизацию" }
+          ],
+          stepsH2: "Как заказать работу",
+          steps: [
+            { h3: "Расскажите о грузе", p: "Назовите, что нужно поднять или перевезти, и где это находится." },
+            { h3: "Согласуем доступ и цену", p: "Цену определяют маршрут, груз, условия подъёма и объём работы." },
+            { h3: "Поднимаем и доставляем", p: "Выполняем согласованные подъёмные, погрузочные и транспортные работы." }
+          ],
+          priceH2: "Цена",
+          price: { label: "Работы автоманипулятора", from: "", price: "по ситуации", per: "Цену определяют груз, маршрут и объём работы", note: "Точную цену назовём по телефону — звоните." },
+          factorsH3: "Точную цену определяют",
+          factors: ["тип и размеры груза", "условия подъёма", "возможность подъезда", "расстояние и пункт назначения", "объём работы"],
+          priceLink: "Уточнить цену",
+          relatedH2: "Другие услуги эвакуатора",
+          cta: { h2: "Нужен автоманипулятор?", p: "Позвоните и расскажите, что нужно поднять или доставить." }
         }
       }
     }
@@ -763,7 +929,7 @@ export const T = {
         cards: [
           { h3: "Car towing", p: "Around-the-clock car towing, transport from an accident scene, towing with blocked or damaged wheels, vehicle recovery, locked steering.", link: "auto", alt: "Green minivan loaded on a tow-truck platform in Daugavpils" },
           { h3: "Truck towing", p: "Trucks, buses, heavy machinery.", link: "kravas", alt: "Heavy tow truck on a muddy road" },
-          { h3: "Trailer transport", p: "Construction, heavy and agricultural machinery.", link: null, alt: "Agricultural tractor secured on a trailer platform" },
+          { h3: "Trailer transport", p: "Construction, heavy and agricultural machinery.", link: "treileris", alt: "Agricultural tractor secured on a trailer platform" },
           { h3: "24/7 roadside assistance", p: "Recovery from ditches, snow and mud. Tyre repair or replacement. Jump start. Fuel delivery.", link: "cela", alt: "Roadside wheel change on a grey car" }
         ]
       },
@@ -796,8 +962,8 @@ export const T = {
       work: {
         eyebrow: "Real call-outs",
         h2: "Our work",
-        tabs: ["Car towing", "Truck towing", "Trailer transport", "Roadside assistance"],
-        alts: ["Car tow truck at work", "Truck tow truck at work", "Trailer transporting machinery", "Roadside assistance"]
+        tabs: ["Car towing", "Truck towing", "Trailer transport", "Roadside assistance", "Vehicle recovery", "Truck-mounted crane work"],
+        alts: ["Tow truck transporting a passenger car", "Heavy tow truck at work", "Trailer transporting a boom lift", "Roadside wheel change", "Vehicle recovery from a ditch and snow", "Truck-mounted crane lifting and transport work"]
       },
       reviews: {
         eyebrow: "Google reviews",
@@ -857,8 +1023,8 @@ export const T = {
           includes: ["Transport from an accident scene", "Towing with damaged or blocked wheels", "Towing with locked steering", "Recovery from ditches, snow and mud", "Motorcycle and quad bike towing", "Delivery to a garage or any address"],
           photosH2: "From the job",
           photos: [
-            { img: "fleet-01", alt: "Tow truck with a van loaded on its platform", caption: "Flatbed towing" },
-            { img: "client-collage-auto", alt: "Collage of car towing jobs", caption: "Real call-outs" }
+            { img: "client-auto-audi", alt: "Red passenger car on a yellow tow truck", caption: "Passenger car towing" },
+            { img: "client-auto-van", alt: "Green van on a yellow tow truck in Daugavpils", caption: "Van transport" }
           ],
           stepsH2: "How a call works",
           steps: [
@@ -893,8 +1059,8 @@ export const T = {
           includes: ["Trucks and tractor units", "Buses and maxi vans", "Construction and heavy equipment", "Agricultural machinery", "Scissor lifts and specialised machinery", "Recovery of heavy machinery from hard-to-reach places"],
           photosH2: "From the job",
           photos: [
-            { img: "hero", alt: "Heavy tow truck carrying scissor lifts in the rain", caption: "Scissor lift transport" },
-            { img: "fleet-02", alt: "Heavy tow truck next to a truck", caption: "Heavy machinery towing" }
+            { img: "client-kravas-heavy", alt: "Red heavy tow truck in snow", caption: "Heavy tow truck" },
+            { img: "client-kravas-mud", alt: "Heavy tow truck on a rural road", caption: "Heavy machinery towing" }
           ],
           stepsH2: "How a call works",
           steps: [
@@ -909,6 +1075,42 @@ export const T = {
           priceLink: "Find out the price",
           relatedH2: "Other tow truck services",
           cta: { h2: "Need heavy towing?", p: "Call us — we answer around the clock, including weekends and holidays." }
+        }
+      },
+      treileris: {
+        title: "Trailer Transport in Daugavpils | Machinery Transport 24/7",
+        description: "Trailer transport in Daugavpils and Latgale for heavy, construction, specialist and agricultural machinery. Call +371 22002700.",
+        h1: "Trailer Transport in Daugavpils",
+        tagline: "Recovery and transport for heavy, construction and agricultural machinery.",
+        breadcrumb: "Trailer transport",
+        heroEyebrow: "Daugavpils, Latgale and all of Latvia",
+        availability: "Call-outs around the clock",
+        sections: {
+          about: {
+            h2: "A trailer for machinery that cannot travel under its own power.",
+            lead: "We take heavy and specialised machinery to a worksite, garage or another specified destination.",
+            p: "Trailer transport is available in Daugavpils, Latgale and on routes across Latvia. Before departure, we confirm the machinery type and dimensions, loading point and destination."
+          },
+          includesH2: "What we carry on the trailer",
+          includes: ["Construction and specialist machinery", "Agricultural machinery", "Boom lifts and specialised equipment", "Heavy machinery", "Delivery to a worksite or garage", "Transport between towns"],
+          photosH2: "From the job",
+          photos: [
+            { img: "client-treiler-lift", alt: "Yellow boom lift on a red trailer", caption: "Boom lift transport" },
+            { img: "client-treiler-tractor", alt: "Agricultural tractor on a trailer platform", caption: "Agricultural machinery transport" }
+          ],
+          stepsH2: "How an order works",
+          steps: [
+            { h3: "Name the machinery and location", p: "Tell us what must be moved, where it is and where it needs to go." },
+            { h3: "We agree on the job and price", p: "The price depends on the route, machinery dimensions and loading conditions." },
+            { h3: "We load and transport", p: "We secure the machinery and deliver it to the agreed destination." }
+          ],
+          priceH2: "Price",
+          price: { label: "Trailer transport", from: "", price: "depends on the job", per: "The price depends on the route, machinery and loading conditions", note: "Call us for an exact quote." },
+          factorsH3: "The exact price depends on",
+          factors: ["distance and destination", "machinery type and dimensions", "site access", "loading and securing work", "call-out time"],
+          priceLink: "Find out the price",
+          relatedH2: "Other tow truck services",
+          cta: { h2: "Need to move heavy machinery?", p: "Call and tell us the machinery type, location and destination." }
         }
       },
       cela: {
@@ -929,7 +1131,7 @@ export const T = {
           includes: ["Recovery from ditches, snow and mud", "Tyre repair or replacement", "Jump start for a flat battery", "Fuel delivery", "Towing if it can't be fixed on the spot"],
           photosH2: "From the job",
           photos: [
-            { img: "fleet-04", alt: "Tow truck loading a van on a rural road", caption: "Call-outs outside the city" }
+            { img: "client-roadside-wheel", alt: "Changing a wheel on a grey car by the road", caption: "Roadside wheel change" }
           ],
           stepsH2: "How a call works",
           steps: [
@@ -964,8 +1166,8 @@ export const T = {
           includes: ["Recovery from a ditch", "Recovery from snow", "Recovery from mud and sand", "Recovery of cars and heavy machinery", "Onward transport after recovery"],
           photosH2: "From the job",
           photos: [
-            { img: "fleet-05", alt: "Heavy tow truck recovering machinery from a muddy road", caption: "Recovery on a rural road" },
-            { img: "fleet-04", alt: "Tow truck loading a van on a rural road", caption: "Loading after recovery" }
+            { img: "client-recovery-collage", alt: "Truck-mounted crane recovering cars from a ditch and snow", caption: "Recovery in different conditions" },
+            { img: "client-kravas-mud", alt: "Heavy tow truck working on a muddy rural road", caption: "Heavy machinery recovery" }
           ],
           stepsH2: "How a call works",
           steps: [
@@ -1000,8 +1202,14 @@ export const T = {
           includes: ["Car towing", "Truck towing", "Roadside assistance", "Vehicle recovery", "Machinery transport between cities"],
           photosH2: "From the job",
           photos: [
-            { img: "fleet-03", alt: "Trailer with machinery on a rural road", caption: "Machinery transport in the region" },
-            { img: "fleet-01", alt: "Tow truck with a van loaded on its platform", caption: "Call-outs around the clock" }
+            { img: "client-auto-audi", alt: "Tow truck with a passenger car in Latgale", caption: "Car towing" },
+            { img: "client-kravas-heavy", alt: "Heavy tow truck in winter conditions", caption: "Heavy towing" },
+            { img: "client-treiler-lift", alt: "Boom lift on a trailer platform", caption: "Trailer transport" },
+            { img: "client-roadside-wheel", alt: "Roadside wheel change", caption: "Roadside assistance" },
+            { img: "client-recovery-collage", alt: "Vehicle recovery from a ditch and snow", caption: "Vehicle recovery" },
+            { img: "client-auto-van", alt: "Van on a tow truck platform", caption: "Transport across Latgale" },
+            { img: "client-treiler-tractor", alt: "Tractor on a trailer", caption: "Agricultural machinery" },
+            { img: "client-manipulator-collage", alt: "Truck-mounted crane work in Daugavpils and Latgale", caption: "Truck-mounted crane work" }
           ],
           stepsH2: "How a call works",
           steps: [
@@ -1016,6 +1224,46 @@ export const T = {
           priceLink: "Find out the price",
           relatedH2: "Other tow truck services",
           cta: { h2: "Need a tow truck in Latgale?", p: "Call us — we answer around the clock, including weekends and holidays." }
+        }
+      },
+      manipulators: {
+        title: "Truck-Mounted Crane Services in Daugavpils and Latgale",
+        description: "Truck-mounted crane services in Daugavpils and Latgale: cars taken for scrapping, construction materials and sauna building transport, lifting work. Call +371 22002700.",
+        h1: "Truck-Mounted Crane Services in Daugavpils",
+        tagline: "Lifting, loading and transport work in Daugavpils and across Latgale.",
+        breadcrumb: "Truck-mounted crane work",
+        heroEyebrow: "Daugavpils and Latgale",
+        availability: "Call-outs around the clock",
+        sections: {
+          about: {
+            h2: "Crane and transport in one call-out.",
+            lead: "We lift, load and transport cars, construction materials and other loads.",
+            p: "We work in Daugavpils and across Latgale, including Krāslava, Preiļi, Līvāni, Rēzekne and Ilūkste. Before departure, we confirm the load, access, lifting conditions and destination."
+          },
+          includesH2: "What we can do",
+          includes: ["Truck-mounted crane work", "Cars transported for scrapping", "Loading and transport of construction materials", "Transport of sauna buildings", "Lifting and positioning loads", "Transport in Daugavpils and Latgale"],
+          photosH2: "Truck-mounted crane at work",
+          photos: [
+            { img: "client-manipulator-01", alt: "Truck-mounted crane recovering a car from a ditch", caption: "Lifting a car from a ditch" },
+            { img: "client-manipulator-02", alt: "Truck-mounted crane recovering a car in snow", caption: "Winter recovery work" },
+            { img: "client-manipulator-03", alt: "Truck-mounted crane lifting a damaged car", caption: "Loading a damaged car" },
+            { img: "client-manipulator-04", alt: "Truck-mounted crane moving a large load", caption: "Lifting a load" },
+            { img: "client-manipulator-05", alt: "Truck-mounted crane loading a car", caption: "Loading a car" },
+            { img: "client-manipulator-06", alt: "Truck-mounted crane taking a car for scrapping", caption: "Car transport for scrapping" }
+          ],
+          stepsH2: "How to book the work",
+          steps: [
+            { h3: "Tell us about the load", p: "Name what must be lifted or transported and where it is." },
+            { h3: "We confirm access and price", p: "The price depends on the route, load, lifting conditions and scope of work." },
+            { h3: "We lift and deliver", p: "We carry out the agreed lifting, loading and transport work." }
+          ],
+          priceH2: "Price",
+          price: { label: "Truck-mounted crane work", from: "", price: "depends on the job", per: "The price depends on the load, route and scope of work", note: "Call us for an exact quote." },
+          factorsH3: "The exact price depends on",
+          factors: ["load type and dimensions", "lifting conditions", "site access", "distance and destination", "scope of work"],
+          priceLink: "Find out the price",
+          relatedH2: "Other tow truck services",
+          cta: { h2: "Need a truck-mounted crane?", p: "Call and tell us what needs to be lifted or delivered." }
         }
       }
     }
@@ -1038,9 +1286,11 @@ export const BUSINESS = {
 
 // Per-service og:image (jpg for maximal social crawler compatibility).
 export const SERVICE_OG = {
-  auto: "assets/images/fleet-01-1200.webp",
-  kravas: "assets/images/hero-1200.webp",
-  cela: "assets/images/fleet-04-1200.webp",
-  izvilkshana: "assets/images/fleet-05-1200.webp",
-  latgale: "assets/images/fleet-03-1200.webp"
+  auto: "assets/images/client-auto-audi-1200.webp",
+  kravas: "assets/images/client-kravas-heavy-1200.webp",
+  treileris: "assets/images/client-treiler-lift-1200.webp",
+  cela: "assets/images/client-roadside-wheel-1200.webp",
+  izvilkshana: "assets/images/client-recovery-collage-1200.webp",
+  latgale: "assets/images/client-treiler-tractor-1200.webp",
+  manipulators: "assets/images/client-manipulator-collage-1200.webp"
 };

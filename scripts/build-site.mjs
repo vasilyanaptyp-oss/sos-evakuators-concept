@@ -8,12 +8,12 @@ import { fileURLToPath } from "node:url";
 import { LANGS, LANG_META, SERVICES, T, BUSINESS, SERVICE_OG } from "./site-content.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const ASSETS_V = "20260908-short-mobile-hero";
+const ASSETS_V = "20260909-new-services-gallery";
 const CONCEPT_BASE = "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
 const PRODUCTION_BASE = "https://autopalidziba.lv";
 const CONCEPT_ROBOTS = "noindex, nofollow";
 const PRODUCTION_ROBOTS = "index, follow";
-const LASTMOD = "2026-09-05";
+const LASTMOD = "2026-09-09";
 const MENU_OPEN = { lv: "Atvērt izvēlni", ru: "Открыть меню", en: "Open menu" };
 
 const production = process.argv.includes("--production");
@@ -309,16 +309,18 @@ function homePage(lang) {
   const marqueeHtml = marqueeItems.map((item, i) => `<span${i >= h.marquee.length ? ' aria-hidden="true"' : ""}>${esc(item)}</span><i${i >= h.marquee.length ? ' aria-hidden="true"' : ""}></i>`).join("");
 
   const galleryImages = [
-    { img: "fleet-01", sizes: [640, 800, 1200], extra: 'assets/images/fleet-01.webp 1600w' },
-    { img: "fleet-02", sizes: [640, 800, 1200], extra: 'assets/images/fleet-02.webp 1600w' },
-    { img: "fleet-03", sizes: [640, 800, 1200], extra: 'assets/images/fleet-03.webp 1600w' },
-    { img: "fleet-04", sizes: [640, 800, 1200], extra: 'assets/images/fleet-04.webp 1600w' }
+    { img: "client-auto-audi", width: 1200, height: 1200 },
+    { img: "client-kravas-heavy", width: 1200, height: 1200 },
+    { img: "client-treiler-lift", width: 1200, height: 1200 },
+    { img: "client-roadside-wheel", width: 1200, height: 1600 },
+    { img: "client-recovery-collage", width: 1200, height: 567 },
+    { img: "client-manipulator-collage", width: 1200, height: 756 }
   ];
   const galleryPanels = h.work.tabs.map((tab, i) => {
     const g = galleryImages[i];
-    const srcset = [640, 800, 1200].map((s) => `${assetPrefix}assets/images/${g.img}-${s}.webp ${s}w`).join(", ") + `, ${assetPrefix}${g.extra}`;
+    const srcset = [640, 800, 1200].map((s) => `${assetPrefix}assets/images/${g.img}-${s}.webp ${s}w`).join(", ");
     return `        <figure class="gallery-panel" id="gallery-panel-${i}" role="tabpanel" aria-labelledby="gallery-tab-${i}" data-gallery-panel="${i}"${i > 0 ? " hidden" : ""}>
-          <img src="${assetPrefix}assets/images/${g.img}-1200.webp" srcset="${srcset}" sizes="94vw" width="1600" height="1067" alt="${esc(h.work.alts[i])}" loading="lazy" decoding="async">
+          <img src="${assetPrefix}assets/images/${g.img}-1200.webp" srcset="${srcset}" sizes="94vw" width="${g.width}" height="${g.height}" alt="${esc(h.work.alts[i])}" loading="lazy" decoding="async">
           <figcaption>${esc(tab)}</figcaption>
         </figure>`;
   }).join("\n");
@@ -611,9 +613,28 @@ function servicePage(lang, key) {
   const assetPrefix = rel(dirSegments, []);
   const related = SERVICES.filter((svc) => svc.key !== key).slice(0, 3);
 
-  const photosHtml = s.photos.length > 1 ? "svc-photos" : "svc-photos svc-photos--single";
+  const photosHtml = s.photos.length > 2
+    ? "svc-photos svc-photos--collection"
+    : s.photos.length > 1 ? "svc-photos" : "svc-photos svc-photos--single";
   const priceFrom = s.price.from ? `<small>${esc(s.price.from)}</small> ` : "";
-  const photoHeight = (name) => (name === "client-collage-auto" ? 1500 : name === "hero" ? 900 : 800);
+  const photoMeta = (name) => {
+    if (name.startsWith("client-manipulator-") && name !== "client-manipulator-collage") return { widths: [640], width: 640, height: 605 };
+    const dimensions = {
+      "client-auto-audi": [1200, 1200],
+      "client-kravas-heavy": [1200, 1200],
+      "client-treiler-lift": [1200, 1200],
+      "client-roadside-wheel": [1200, 1600],
+      "client-treiler-tractor": [1200, 1600],
+      "client-kravas-mud": [1200, 1600],
+      "client-auto-van": [1200, 1600],
+      "client-recovery-collage": [1200, 567],
+      "client-manipulator-collage": [1200, 756],
+      "client-collage-auto": [1200, 1500],
+      hero: [1200, 900]
+    };
+    const [width, height] = dimensions[name] || [1200, 800];
+    return { widths: [640, 800, 1200], width, height };
+  };
   const relatedNote = (svcKey) => {
     const price = T[lang].servicesPages[svcKey].sections.price;
     return price.from ? `${price.from} ${price.price}` : t.availabilityChip;
@@ -686,10 +707,16 @@ ${mobileMenu(lang, key, dirSegments)}
         </ul>
       </div>
       <div class="${photosHtml}">
-        ${s.photos.map((photo) => `<figure>
-          <img src="${assetPrefix}assets/images/${photo.img}-1200${photo.img === "client-collage-auto" || photo.img === "fleet-01" || photo.img === "fleet-05" ? ".avif" : ".webp"}" srcset="${assetPrefix}assets/images/${photo.img}-640.webp 640w, ${assetPrefix}assets/images/${photo.img}-800.webp 800w, ${assetPrefix}assets/images/${photo.img}-1200.webp 1200w" sizes="(max-width: 820px) 94vw, 50vw" width="1200" height="${photoHeight(photo.img)}" alt="${esc(photo.alt)}" loading="lazy" decoding="async">
+        ${s.photos.map((photo) => {
+          const meta = photoMeta(photo.img);
+          const largest = meta.widths.at(-1);
+          const srcset = meta.widths.map((width) => `${assetPrefix}assets/images/${photo.img}-${width}.webp ${width}w`).join(", ");
+          const sizes = s.photos.length > 2 ? "(max-width: 560px) 94vw, (max-width: 820px) 47vw, 31vw" : "(max-width: 820px) 94vw, 50vw";
+          return `<figure>
+          <img src="${assetPrefix}assets/images/${photo.img}-${largest}.webp" srcset="${srcset}" sizes="${sizes}" width="${meta.width}" height="${meta.height}" alt="${esc(photo.alt)}" loading="lazy" decoding="async">
           <figcaption>${esc(photo.caption)}</figcaption>
-        </figure>`).join("\n        ")}
+        </figure>`;
+        }).join("\n        ")}
       </div>
     </section>
 
