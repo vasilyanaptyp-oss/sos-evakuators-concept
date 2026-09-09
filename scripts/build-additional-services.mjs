@@ -3,7 +3,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const BASE = "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
+const PRODUCTION = process.argv.includes("--production");
+const BASE = PRODUCTION
+  ? "https://autopalidziba.lv"
+  : "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
+const ROBOTS = PRODUCTION ? "index, follow" : "noindex, nofollow";
 const VERSION = "20260909-multilingual";
 const LANGS = ["lv", "ru", "en"];
 const ROUTES = {
@@ -26,7 +30,7 @@ function languages(lang,page,from){return LANGS.map(code=>`<a href="${rel(from,R
 function head(lang,page,title,description,from){const canonical=absolute(ROUTES[page][lang]);const alternates=LANGS.map(code=>`<link rel="alternate" hreflang="${code}" href="${absolute(ROUTES[page][code])}">`).join("\n  ");return `<meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0d0f11">
-  <meta name="robots" content="noindex, nofollow">
+  <meta name="robots" content="${ROBOTS}">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; font-src 'self'; style-src 'self'; script-src 'self'; object-src 'none'; base-uri 'none'">
   <meta name="description" content="${esc(description)}">
@@ -65,4 +69,4 @@ function shell(lang,page,main,title,description){const t=C[lang],from=ROUTES[pag
 function hub(lang){const t=C[lang],from=ROUTES.hub[lang];const items=["wells","waste","fitness"].map((key,i)=>`<a class="directory-item" href="${rel(from,ROUTES[key][lang])}"><span class="directory-item__number">0${i+1}</span><div class="directory-item__copy"><h3>${t.services[key]}</h3><p>${t.info}</p></div><span class="directory-item__arrow" aria-hidden="true">↗</span></a>`).join("");const main=`<section class="directory-hero" aria-labelledby="page-title"><div class="directory-hero__inner"><div><p class="eyebrow">${t.eyebrow}</p><h1 id="page-title">${t.accent}</h1></div><p class="hero-note"><strong>${t.count}</strong>${t.note}</p></div></section><section class="directory" aria-labelledby="directory-title"><div class="directory__head"><p class="section-index">${t.list}</p><h2 id="directory-title">${t.choose}</h2></div><nav class="directory-list" aria-label="${t.hub}">${items}</nav></section>`;return shell(lang,"hub",main,`${t.hub} | AUTOPALĪDZĪBA.LV`,t.note);}
 function service(lang,key){const t=C[lang],from=ROUTES[key][lang],name=t.services[key],hubHref=rel(from,ROUTES.hub[lang]),number=String(["wells","waste","fitness"].indexOf(key)+1).padStart(2,"0");const main=`<section class="service-hero" aria-labelledby="page-title"><div class="service-hero__inner"><div class="service-hero__meta"><div><nav class="breadcrumb" aria-label="${t.hub}"><a href="${hubHref}">${t.hub}</a><span aria-hidden="true">/</span><span>${name}</span></nav><h1 id="page-title">${name}.</h1></div><p class="service-status"><strong>${t.preparing}</strong>${t.status}</p></div></div></section><section class="placeholder-section" aria-labelledby="placeholder-title"><div class="placeholder-grid"><div class="placeholder-copy"><p class="section-index">${number} / ${name}</p><h2 id="placeholder-title">${t.placeholder}</h2><p>${t.placeholderText}</p></div><div class="placeholder-panel" aria-label="${t.planned}">${t.rows.map((row,i)=>`<div class="placeholder-row"><span>0${i+1}</span><strong>${row}</strong></div>`).join("")}</div></div><div class="page-actions"><a class="page-action" href="${hubHref}">${t.all}</a><a class="page-action page-action--secondary" href="${rel(from,HOME[lang])}">${t.main}</a></div></section>`;return shell(lang,key,main,`${name} | ${t.hub}`,t.status);}
 for(const lang of LANGS){for(const page of Object.keys(ROUTES)){const html=page==="hub"?hub(lang):service(lang,page),dir=path.join(ROOT,...ROUTES[page][lang]);fs.mkdirSync(dir,{recursive:true});fs.writeFileSync(path.join(dir,"index.html"),html);}}
-console.log("Additional services: 12 localized pages written");
+console.log(`Additional services: 12 localized pages written (${PRODUCTION ? "production" : "concept"})`);
