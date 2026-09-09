@@ -75,3 +75,12 @@ No personal data (names, phone numbers, issue texts, coordinates, photos) is eve
 The concept links the existing profile review form (`g.page/r/CQ1F6-eN5ajgEAE/review`, place id
 `ChIJ7-Ug3hGVwkYRDUXr543lqOA`). Schema.org markup deliberately contains **no** address or
 coordinates: the client has not confirmed a customer-facing address yet.
+
+## Content management
+
+The production host includes a private `/admin/` panel. It keeps the public site static and fast:
+edits are saved as a draft, rendered from protected baseline copies and written to the public HTML
+only after an explicit publish action. The editor supports SEO fields, page text, image/ALT
+replacement, global phone/e-mail changes, reusable content blocks, media uploads, preview and
+revision restore. Runtime data and credentials live in `admin/storage/` and are intentionally not
+committed.

@@ -823,6 +823,7 @@ function robotsTxt() {
 # Indexability is controlled by the <meta name="robots"> tag on each page (${ROBOTS}).
 User-agent: *
 Allow: /
+Disallow: /admin/
 
 Sitemap: ${BASE}/sitemap.xml
 `;

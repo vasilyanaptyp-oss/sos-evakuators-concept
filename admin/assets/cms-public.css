@@ -1,0 +1,30 @@
+.cms-block-zone {
+  padding: clamp(72px, 9vw, 150px) clamp(18px, 5vw, 72px);
+  border-top: 1px solid rgba(255, 255, 255, .12);
+  background: #0d0f11;
+  color: #f5f4ef;
+}
+.cms-block-zone__inner { width: min(1240px, 100%); margin: 0 auto; }
+.cms-block { padding: clamp(36px, 5vw, 72px) 0; border-bottom: 1px solid rgba(255,255,255,.12); }
+.cms-block:last-child { border-bottom: 0; }
+.cms-block__eyebrow { margin: 0 0 16px; color: #f5c526; font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.cms-block h2 { max-width: 980px; margin: 0; color: #f5f4ef; font-size: clamp(36px, 6vw, 84px); line-height: .96; letter-spacing: -.055em; }
+.cms-block__body { max-width: 780px; margin: 24px 0 0; color: #a7aaad; font-size: clamp(17px, 2vw, 22px); line-height: 1.55; }
+.cms-block--split { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: clamp(28px, 6vw, 86px); align-items: center; }
+.cms-block--split.cms-block--reverse figure { order: 2; }
+.cms-block--split figure { margin: 0; aspect-ratio: 4 / 3; overflow: hidden; background: #151719; }
+.cms-block--split img { width: 100%; height: 100%; object-fit: cover; }
+.cms-block--list { display: grid; grid-template-columns: minmax(0,1fr) minmax(300px,.7fr); gap: clamp(32px, 7vw, 100px); }
+.cms-block--list ul { margin: 0; padding: 0; list-style: none; }
+.cms-block--list li { padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,.14); font-size: clamp(17px, 2vw, 22px); }
+.cms-block--list li::before { content: "→"; margin-right: 14px; color: #f5c526; }
+.cms-block--cta { display: flex; align-items: end; justify-content: space-between; gap: 34px; padding-inline: clamp(22px,4vw,52px); background: #f5c526; color: #101112; }
+.cms-block--cta .cms-block__eyebrow, .cms-block--cta h2, .cms-block--cta .cms-block__body { color: #101112; }
+.cms-block--cta .cms-block__button { display: inline-flex; min-height: 58px; flex: 0 0 auto; align-items: center; justify-content: center; padding: 0 28px; border: 2px solid #101112; color: #101112; font-weight: 850; text-decoration: none; }
+.cms-block--cta .cms-block__button:hover { background: #101112; color: #f5c526; }
+@media (max-width: 760px) {
+  .cms-block--split, .cms-block--list { grid-template-columns: 1fr; }
+  .cms-block--split.cms-block--reverse figure { order: 0; }
+  .cms-block--cta { align-items: stretch; flex-direction: column; }
+  .cms-block--cta .cms-block__button { width: 100%; }
+}

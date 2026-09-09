@@ -6,3 +6,9 @@ qa*.cjs
 optimize-images.py
 serve.js
 package.json
+admin/storage/*.json
+admin/storage/baseline/
+admin/storage/revisions/
+admin/storage/*.lock
+assets/uploads/*
+!assets/uploads/.htaccess
