@@ -318,8 +318,8 @@ function homePage(lang) {
     { img: "client-kravas-heavy", width: 1200, height: 1200 },
     { img: "client-treiler-lift", width: 1200, height: 1200 },
     { img: "client-roadside-wheel", width: 1200, height: 1600 },
-    { img: "client-recovery-collage", width: 1200, height: 567 },
-    { img: "client-manipulator-collage", width: 1200, height: 756 }
+    { img: "client-manipulator-01", width: 640, height: 605 },
+    { img: "client-manipulator-03", width: 640, height: 605 }
   ];
   const galleryPanels = h.work.tabs.map((tab, i) => {
     const g = galleryImages[i];
