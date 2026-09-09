@@ -314,18 +314,19 @@ function homePage(lang) {
   const marqueeHtml = marqueeItems.map((item, i) => `<span${i >= h.marquee.length ? ' aria-hidden="true"' : ""}>${esc(item)}</span><i${i >= h.marquee.length ? ' aria-hidden="true"' : ""}></i>`).join("");
 
   const galleryImages = [
-    { img: "client-auto-audi", width: 1200, height: 1200 },
-    { img: "client-kravas-heavy", width: 1200, height: 1200 },
-    { img: "client-treiler-lift", width: 1200, height: 1200 },
-    { img: "client-roadside-wheel", width: 1200, height: 1600 },
-    { img: "client-manipulator-01", width: 640, height: 605 },
-    { img: "client-manipulator-03", width: 640, height: 605 }
+    { img: "client-auto-audi", widths: [640, 800, 1200], width: 1200, height: 1200 },
+    { img: "client-kravas-heavy", widths: [640, 800, 1200], width: 1200, height: 1200 },
+    { img: "client-treiler-lift", widths: [640, 800, 1200], width: 1200, height: 1200 },
+    { img: "client-roadside-wheel", widths: [640, 800, 1200], width: 1200, height: 1600 },
+    { img: "client-manipulator-01", widths: [640], width: 640, height: 605 },
+    { img: "client-manipulator-03", widths: [640], width: 640, height: 605 }
   ];
   const galleryPanels = h.work.tabs.map((tab, i) => {
     const g = galleryImages[i];
-    const srcset = [640, 800, 1200].map((s) => `${assetPrefix}assets/images/${g.img}-${s}.webp ${s}w`).join(", ");
+    const largestWidth = g.widths[g.widths.length - 1];
+    const srcset = g.widths.map((s) => `${assetPrefix}assets/images/${g.img}-${s}.webp ${s}w`).join(", ");
     return `        <figure class="gallery-panel" id="gallery-panel-${i}" role="tabpanel" aria-labelledby="gallery-tab-${i}" data-gallery-panel="${i}"${i > 0 ? " hidden" : ""}>
-          <img src="${assetPrefix}assets/images/${g.img}-1200.webp" srcset="${srcset}" sizes="94vw" width="${g.width}" height="${g.height}" alt="${esc(h.work.alts[i])}" loading="lazy" decoding="async">
+          <img src="${assetPrefix}assets/images/${g.img}-${largestWidth}.webp" srcset="${srcset}" sizes="94vw" width="${g.width}" height="${g.height}" alt="${esc(h.work.alts[i])}" loading="lazy" decoding="async">
           <figcaption>${esc(tab)}</figcaption>
         </figure>`;
   }).join("\n");
