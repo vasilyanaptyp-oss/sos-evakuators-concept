@@ -8,6 +8,7 @@ const CMS_PRIMARY_TEL = '+37122002700';
 const CMS_SECONDARY_PHONE = '+371 20091762';
 const CMS_SECONDARY_TEL = '+37120091762';
 const CMS_EMAIL = 'tktrans@inbox.lv';
+const CMS_ANALYTICS_VERSION = '20260910-private-insights';
 
 function cms_strlen(string $value): int
 {
@@ -470,7 +471,8 @@ function cms_render_page(string $page, array $state): string
     cms_sync_structured_data($dom, $state['global'] ?? []);
     cms_inject_blocks($dom, $pageState['blocks'] ?? []);
     $rendered = $dom->saveHTML();
-    return $rendered === false ? $html : $rendered;
+    $output = $rendered === false ? $html : $rendered;
+    return (string) preg_replace('/analytics\.js\?v=[A-Za-z0-9._-]+/', 'analytics.js?v=' . CMS_ANALYTICS_VERSION, $output);
 }
 
 function cms_nearest_label(DOMNode $node): string
@@ -994,6 +996,9 @@ function cms_change_password(string $current, string $next): void
 
 function cms_health(): array
 {
+    $diskTotal = @disk_total_space(CMS_ROOT);
+    $diskFree = @disk_free_space(CMS_ROOT);
+    $loads = function_exists('sys_getloadavg') ? @sys_getloadavg() : false;
     return [
         'php' => PHP_VERSION,
         'dom' => class_exists('DOMDocument'),
@@ -1001,5 +1006,360 @@ function cms_health(): array
         'storage_writable' => is_writable(CMS_STORAGE),
         'uploads_writable' => is_writable(CMS_UPLOADS),
         'root_writable' => is_writable(CMS_ROOT),
+        'disk_total' => is_numeric($diskTotal) ? (int) $diskTotal : null,
+        'disk_free' => is_numeric($diskFree) ? (int) $diskFree : null,
+        'disk_used_percent' => is_numeric($diskTotal) && $diskTotal > 0 && is_numeric($diskFree)
+            ? round((1 - ($diskFree / $diskTotal)) * 100, 1)
+            : null,
+        'load_1m' => is_array($loads) && isset($loads[0]) ? round((float) $loads[0], 2) : null,
+        'memory_limit' => (string) ini_get('memory_limit'),
+        'response_ms' => defined('CMS_REQUEST_STARTED') ? (int) round((microtime(true) - CMS_REQUEST_STARTED) * 1000) : null,
     ];
+}
+
+function cms_current_user(): string
+{
+    $user = trim((string) ($_SESSION['cms_user'] ?? 'sistēma'));
+    return $user !== '' ? cms_substr($user, 0, 80) : 'sistēma';
+}
+
+function cms_activity_log(string $action, array $details = []): void
+{
+    $allowed = [];
+    foreach (['page', 'file', 'revision', 'pages', 'result'] as $key) {
+        if (isset($details[$key]) && (is_string($details[$key]) || is_numeric($details[$key]))) {
+            $allowed[$key] = cms_substr((string) $details[$key], 0, 180);
+        }
+    }
+    $entry = [
+        'at' => date(DATE_ATOM),
+        'user' => cms_current_user(),
+        'action' => preg_replace('/[^a-z0-9_-]/i', '', $action),
+        'details' => $allowed,
+    ];
+    $payload = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if ($payload !== false) {
+        @file_put_contents(CMS_STORAGE . DIRECTORY_SEPARATOR . 'activity.jsonl', $payload . PHP_EOL, FILE_APPEND | LOCK_EX);
+    }
+}
+
+function cms_activity_list(int $limit = 30): array
+{
+    $path = CMS_STORAGE . DIRECTORY_SEPARATOR . 'activity.jsonl';
+    if (!is_file($path)) {
+        return [];
+    }
+    $lines = @file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+    $result = [];
+    foreach (array_reverse(array_slice($lines, -max(1, min($limit, 100)))) as $line) {
+        $entry = json_decode($line, true);
+        if (is_array($entry)) {
+            $result[] = $entry;
+        }
+    }
+    return $result;
+}
+
+function cms_backup_directory(): string
+{
+    return CMS_STORAGE . DIRECTORY_SEPARATOR . 'backups';
+}
+
+function cms_ensure_daily_backup(): array
+{
+    $directory = cms_backup_directory();
+    if (!is_dir($directory)) {
+        @mkdir($directory, 0750, true);
+    }
+    $id = date('Y-m-d');
+    $path = $directory . DIRECTORY_SEPARATOR . $id . '.json';
+    if (!is_file($path)) {
+        $state = cms_get_state('live');
+        $state['backup'] = [
+            'id' => $id,
+            'created_at' => date(DATE_ATOM),
+            'type' => 'daily-live-state',
+        ];
+        cms_write_json($path, $state);
+    }
+    $files = glob($directory . DIRECTORY_SEPARATOR . '*.json') ?: [];
+    rsort($files, SORT_STRING);
+    foreach (array_slice($files, 30) as $old) {
+        @unlink($old);
+    }
+    return cms_backup_status();
+}
+
+function cms_backup_status(): array
+{
+    $files = glob(cms_backup_directory() . DIRECTORY_SEPARATOR . '*.json') ?: [];
+    rsort($files, SORT_STRING);
+    return [
+        'count' => count($files),
+        'latest' => $files ? basename($files[0], '.json') : null,
+        'retention_days' => 30,
+    ];
+}
+
+function cms_analytics_empty_totals(): array
+{
+    return [
+        'page_view' => 0,
+        'phone_primary' => 0,
+        'phone_secondary' => 0,
+        'whatsapp_open' => 0,
+        'location_open' => 0,
+        'request_prepared' => 0,
+        'sms_open' => 0,
+    ];
+}
+
+function cms_analytics_add(array &$target, array $source): void
+{
+    foreach (cms_analytics_empty_totals() as $key => $unused) {
+        $target[$key] = (int) ($target[$key] ?? 0) + (int) ($source[$key] ?? 0);
+    }
+}
+
+function cms_analytics_summary(int $days = 30): array
+{
+    $days = max(1, min($days, 90));
+    $directory = CMS_STORAGE . DIRECTORY_SEPARATOR . 'analytics';
+    $totals = cms_analytics_empty_totals();
+    $daily = [];
+    $visitors = [];
+    $pages = [];
+    $languages = [];
+    $devices = [];
+    $sources = [];
+    $lastUpdated = null;
+
+    for ($offset = $days - 1; $offset >= 0; $offset--) {
+        $date = date('Y-m-d', strtotime('-' . $offset . ' days'));
+        $data = cms_read_json($directory . DIRECTORY_SEPARATOR . $date . '.json');
+        $dayTotals = cms_analytics_empty_totals();
+        cms_analytics_add($dayTotals, (array) ($data['totals'] ?? []));
+        cms_analytics_add($totals, $dayTotals);
+        foreach ((array) ($data['visitors'] ?? []) as $visitor => $value) {
+            if ($value && count($visitors) < 20000) {
+                $visitors[(string) $visitor] = true;
+            }
+        }
+        foreach ((array) ($data['pages'] ?? []) as $path => $row) {
+            if (!isset($pages[$path])) {
+                $pages[$path] = cms_analytics_empty_totals();
+            }
+            cms_analytics_add($pages[$path], (array) $row);
+        }
+        foreach ((array) ($data['languages'] ?? []) as $label => $count) {
+            $languages[(string) $label] = (int) ($languages[(string) $label] ?? 0) + (int) $count;
+        }
+        foreach ((array) ($data['devices'] ?? []) as $label => $count) {
+            $devices[(string) $label] = (int) ($devices[(string) $label] ?? 0) + (int) $count;
+        }
+        foreach ((array) ($data['sources'] ?? []) as $label => $count) {
+            $sources[(string) $label] = (int) ($sources[(string) $label] ?? 0) + (int) $count;
+        }
+        if (!empty($data['updated_at']) && ($lastUpdated === null || strcmp((string) $data['updated_at'], $lastUpdated) > 0)) {
+            $lastUpdated = (string) $data['updated_at'];
+        }
+        $daily[] = [
+            'date' => $date,
+            'visitors' => count((array) ($data['visitors'] ?? [])),
+            'page_views' => $dayTotals['page_view'],
+            'phone_clicks' => $dayTotals['phone_primary'] + $dayTotals['phone_secondary'],
+            'help_actions' => $dayTotals['phone_primary'] + $dayTotals['phone_secondary'] + $dayTotals['whatsapp_open'] + $dayTotals['location_open'] + $dayTotals['request_prepared'],
+        ];
+    }
+
+    uasort($pages, static function (array $a, array $b): int {
+        return ((int) ($b['page_view'] ?? 0)) <=> ((int) ($a['page_view'] ?? 0));
+    });
+    arsort($languages);
+    arsort($devices);
+    arsort($sources);
+
+    $active = cms_read_json($directory . DIRECTORY_SEPARATOR . 'active.json');
+    $online = 0;
+    $now = time();
+    foreach ($active as $session) {
+        if (is_array($session) && ($now - (int) ($session['last_seen'] ?? 0)) <= 300) {
+            $online++;
+        }
+    }
+    $phoneClicks = $totals['phone_primary'] + $totals['phone_secondary'];
+    $helpActions = $phoneClicks + $totals['whatsapp_open'] + $totals['location_open'] + $totals['request_prepared'];
+    $unique = count($visitors);
+    return [
+        'window_days' => $days,
+        'online_now' => $online,
+        'unique_visitors' => $unique,
+        'page_views' => $totals['page_view'],
+        'phone_clicks' => $phoneClicks,
+        'help_actions' => $helpActions,
+        'conversion_percent' => $unique > 0 ? round(($helpActions / $unique) * 100, 1) : 0,
+        'totals' => $totals,
+        'daily' => $daily,
+        'top_pages' => array_slice($pages, 0, 8, true),
+        'languages' => $languages,
+        'devices' => $devices,
+        'sources' => $sources,
+        'updated_at' => $lastUpdated,
+        'notice' => 'Tiek skaitīti pogu nospiedieni, nevis savienoti vai atbildēti zvani.',
+    ];
+}
+
+function cms_audit_issue(array &$issues, string $severity, string $page, string $title, string $detail): void
+{
+    $issues[] = [
+        'severity' => $severity,
+        'page' => $page,
+        'title' => $title,
+        'detail' => $detail,
+    ];
+}
+
+function cms_audit_local_target(string $page, string $href): ?string
+{
+    $href = html_entity_decode(trim($href), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    if ($href === '' || $href[0] === '#' || preg_match('#^(?:https?:|//|tel:|mailto:|sms:|javascript:|data:|blob:)#i', $href)) {
+        return null;
+    }
+    $href = preg_replace('/[?#].*$/', '', $href);
+    $path = isset($href[0]) && $href[0] === '/' ? ltrim($href, '/') : trim(dirname($page), './\\') . '/' . $href;
+    $parts = [];
+    foreach (explode('/', str_replace('\\', '/', rawurldecode($path))) as $part) {
+        if ($part === '' || $part === '.') {
+            continue;
+        }
+        if ($part === '..') {
+            array_pop($parts);
+        } else {
+            $parts[] = $part;
+        }
+    }
+    $path = implode('/', $parts);
+    if ($path === '') {
+        return 'index.html';
+    }
+    if (substr($href, -1) === '/') {
+        $path .= '/index.html';
+    } elseif (pathinfo($path, PATHINFO_EXTENSION) === '' && is_file(CMS_ROOT . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path) . DIRECTORY_SEPARATOR . 'index.html')) {
+        $path .= '/index.html';
+    }
+    return $path;
+}
+
+function cms_site_audit(bool $force = false): array
+{
+    $cache = CMS_STORAGE . DIRECTORY_SEPARATOR . 'site-audit.json';
+    if (!$force && is_file($cache) && (time() - (int) @filemtime($cache)) < 600) {
+        $cached = cms_read_json($cache);
+        if ($cached) {
+            return $cached;
+        }
+    }
+
+    $issues = [];
+    $checked = 0;
+    foreach (cms_list_pages() as $entry) {
+        $page = (string) $entry['path'];
+        $path = CMS_ROOT . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $page);
+        $html = @file_get_contents($path);
+        if ($html === false) {
+            cms_audit_issue($issues, 'error', $page, 'Lapu nevar nolasīt', 'Pārbaudiet faila piekļuves tiesības.');
+            continue;
+        }
+        $checked++;
+        $dom = cms_dom_load($html);
+        $xpath = new DOMXPath($dom);
+        $titleNode = $xpath->query('//title')->item(0);
+        $title = $titleNode ? trim(preg_replace('/\s+/u', ' ', $titleNode->textContent)) : '';
+        $titleLength = cms_strlen($title);
+        if ($title === '') {
+            cms_audit_issue($issues, 'error', $page, 'Nav SEO virsraksta', 'Pievienojiet unikālu <title>.');
+        } elseif ($titleLength < 25 || $titleLength > 65) {
+            cms_audit_issue($issues, 'warning', $page, 'SEO virsraksta garums', 'Pašlaik ' . $titleLength . ' zīmes; orientieris ir 25–65.');
+        }
+
+        $descriptionNode = $xpath->query('//meta[translate(@name,"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz")="description"]')->item(0);
+        $description = $descriptionNode instanceof DOMElement ? trim($descriptionNode->getAttribute('content')) : '';
+        $descriptionLength = cms_strlen($description);
+        if ($description === '') {
+            cms_audit_issue($issues, 'error', $page, 'Nav meta apraksta', 'Pievienojiet lapai unikālu aprakstu.');
+        } elseif ($descriptionLength < 70 || $descriptionLength > 175) {
+            cms_audit_issue($issues, 'warning', $page, 'Meta apraksta garums', 'Pašlaik ' . $descriptionLength . ' zīmes; orientieris ir 70–175.');
+        }
+
+        $h1Count = $xpath->query('//h1')->length;
+        if ($h1Count !== 1) {
+            cms_audit_issue($issues, 'error', $page, 'H1 struktūra', 'Atrasti H1: ' . $h1Count . '; lapā jābūt vienam galvenajam virsrakstam.');
+        }
+        if ($xpath->query('//link[translate(@rel,"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz")="canonical"]')->length < 1) {
+            cms_audit_issue($issues, 'error', $page, 'Nav canonical saites', 'Norādiet lapas galveno URL versiju.');
+        }
+        $hreflangCount = $xpath->query('//link[@hreflang]')->length;
+        if ($hreflangCount > 0 && $hreflangCount < 3) {
+            cms_audit_issue($issues, 'warning', $page, 'Nepilns hreflang komplekts', 'Atrastas tikai ' . $hreflangCount . ' valodu saites.');
+        }
+        $htmlNode = $xpath->query('//html')->item(0);
+        if (!$htmlNode instanceof DOMElement || trim($htmlNode->getAttribute('lang')) === '') {
+            cms_audit_issue($issues, 'error', $page, 'Nav lapas valodas', 'HTML elementam jānorāda lang.');
+        }
+
+        foreach ($xpath->query('//img') as $image) {
+            if (!$image instanceof DOMElement) {
+                continue;
+            }
+            $src = trim($image->getAttribute('src'));
+            if (!$image->hasAttribute('alt') || trim($image->getAttribute('alt')) === '') {
+                cms_audit_issue($issues, 'warning', $page, 'Attēlam nav ALT', $src !== '' ? $src : 'Attēls bez avota.');
+            }
+            $target = cms_audit_local_target($page, $src);
+            if ($target !== null && !is_file(CMS_ROOT . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $target))) {
+                cms_audit_issue($issues, 'error', $page, 'Attēla fails nav atrasts', $src);
+            }
+        }
+
+        foreach ($xpath->query('//a[@href]') as $link) {
+            if (!$link instanceof DOMElement) {
+                continue;
+            }
+            $href = trim($link->getAttribute('href'));
+            $target = cms_audit_local_target($page, $href);
+            if ($target !== null && strpos($target, 'admin/') !== 0 && !is_file(CMS_ROOT . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $target))) {
+                cms_audit_issue($issues, 'error', $page, 'Iekšējā saite nedarbojas', $href);
+            }
+        }
+
+        foreach ($xpath->query('//script[@type="application/ld+json"]') as $script) {
+            json_decode($script->textContent, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                cms_audit_issue($issues, 'error', $page, 'Nederīgi strukturētie dati', json_last_error_msg());
+            }
+        }
+    }
+
+    foreach (cms_media_list() as $media) {
+        if ((int) ($media['bytes'] ?? 0) > 900 * 1024) {
+            cms_audit_issue($issues, 'warning', 'assets', 'Smags attēls', (string) $media['name'] . ' · ' . round(((int) $media['bytes']) / 1024 / 1024, 1) . ' MB');
+        }
+    }
+
+    $counts = ['error' => 0, 'warning' => 0, 'info' => 0];
+    foreach ($issues as $issue) {
+        $severity = (string) ($issue['severity'] ?? 'info');
+        $counts[$severity] = (int) ($counts[$severity] ?? 0) + 1;
+    }
+    $score = max(0, (int) round(100 - min(70, $counts['error'] * 4) - min(25, $counts['warning'] * 1.25)));
+    $result = [
+        'checked_at' => date(DATE_ATOM),
+        'pages_checked' => $checked,
+        'score' => $score,
+        'counts' => $counts,
+        'issues' => array_slice($issues, 0, 250),
+        'note' => 'Vērtējums ir tehnisks orientieris. Tas negarantē pozīciju Google rezultātos.',
+    ];
+    cms_write_json($cache, $result);
+    return $result;
 }

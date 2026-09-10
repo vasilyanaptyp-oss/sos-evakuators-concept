@@ -32,7 +32,7 @@ if (!cms_is_authenticated()):
   <meta name="theme-color" content="#0b0c0d">
   <title>Autopalīdzība · Vadības panelis</title>
   <link rel="icon" href="/assets/images/logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/admin/assets/admin.css?v=1">
+  <link rel="stylesheet" href="/admin/assets/admin.css?v=2">
 </head>
 <body class="login-page">
   <main class="login-shell">
@@ -86,7 +86,7 @@ cms_touch_session();
   <meta name="theme-color" content="#0b0c0d">
   <title>Autopalīdzība · Vadības panelis</title>
   <link rel="icon" href="/assets/images/logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/admin/assets/admin.css?v=1">
+  <link rel="stylesheet" href="/admin/assets/admin.css?v=2">
 </head>
 <body class="admin-page" data-csrf="<?= cms_h(cms_csrf_token()) ?>">
   <a class="skip-link" href="#workspace">Pāriet uz saturu</a>
@@ -98,8 +98,10 @@ cms_touch_session();
       </div>
       <nav class="side-nav" aria-label="Vadības sadaļas">
         <button type="button" class="is-active" data-view="dashboard"><span class="nav-icon">⌂</span><span>Pārskats</span></button>
+        <button type="button" data-view="analytics"><span class="nav-icon">↗</span><span>Statistika</span></button>
         <button type="button" data-view="pages"><span class="nav-icon">▤</span><span>Lapas</span><b data-page-count>—</b></button>
         <button type="button" data-view="media"><span class="nav-icon">◇</span><span>Attēli</span></button>
+        <button type="button" data-view="optimization"><span class="nav-icon">✓</span><span>Optimizācija</span></button>
         <button type="button" data-view="settings"><span class="nav-icon">⚙</span><span>Kontakti</span></button>
         <button type="button" data-view="history"><span class="nav-icon">↶</span><span>Versijas</span></button>
       </nav>
@@ -155,6 +157,6 @@ cms_touch_session();
   </div>
 
   <div class="toast-stack" aria-live="polite" aria-atomic="true" data-toasts></div>
-  <script src="/admin/assets/admin.js?v=1" defer></script>
+  <script src="/admin/assets/admin.js?v=2" defer></script>
 </body>
 </html>

@@ -1,11 +1,13 @@
 /*
  * SOS Evakuators — analytics preparation layer.
  *
- * STATUS: DISABLED BY DEFAULT. Nothing is sent anywhere and no network
- * request to Google is made until real IDs are filled in AND consent is
+ * STATUS: Private first-party counters are enabled. Google Analytics and
+ * Google Ads remain disabled until real IDs are filled in AND consent is
  * granted. There are deliberately NO placeholder IDs in this file.
  *
- * WHAT IT ALREADY DOES TODAY (offline, first-party only):
+ * WHAT IT DOES TODAY:
+ *   - sends anonymous aggregate counters to this site's /track.php endpoint;
+ *     no cookies, IP addresses, form values or coordinates are stored
  *   - pushes privacy-safe events into window.dataLayer
  *     (call_click, whatsapp_open, sms_open, geolocation_start,
  *      geolocation_success, request_prepared)
@@ -43,6 +45,65 @@
 
   window.dataLayer = window.dataLayer || [];
   let gtagLoaded = false;
+
+  let firstPartySession = "";
+  try {
+    firstPartySession = sessionStorage.getItem("ap_session") || "";
+    if (!/^[a-f0-9-]{16,64}$/.test(firstPartySession)) {
+      firstPartySession = globalThis.crypto?.randomUUID?.() || `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}-${Math.random().toString(16).slice(2)}`;
+      sessionStorage.setItem("ap_session", firstPartySession);
+    }
+  } catch (_) {
+    firstPartySession = `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}-${Math.random().toString(16).slice(2)}`;
+  }
+
+  const firstPartySource = (() => {
+    if (!document.referrer) return "direct";
+    try {
+      const host = new URL(document.referrer).hostname.toLowerCase();
+      if (host === location.hostname) return "direct";
+      if (host.includes("google.")) return "google";
+      if (host.includes("bing.")) return "bing";
+      if (host.includes("facebook.") || host.includes("fb.")) return "facebook";
+      if (host.includes("instagram.")) return "instagram";
+      if (host.includes("whatsapp.") || host.includes("wa.me")) return "whatsapp";
+    } catch (_) {}
+    return "other";
+  })();
+
+  const firstPartyDevice = matchMedia("(max-width: 640px)").matches
+    ? "mobile"
+    : matchMedia("(max-width: 1024px)").matches ? "tablet" : "desktop";
+
+  const sendFirstParty = (event) => {
+    const allowed = ["page_view", "heartbeat", "phone_primary", "phone_secondary", "whatsapp_open", "location_open", "request_prepared", "sms_open"];
+    if (!allowed.includes(event)) return;
+    const payload = JSON.stringify({
+      event,
+      session: firstPartySession,
+      path: location.pathname,
+      language: document.documentElement.lang || "lv",
+      device: firstPartyDevice,
+      source: firstPartySource
+    });
+    try {
+      if (navigator.sendBeacon?.("/track.php", new Blob([payload], { type: "application/json" }))) return;
+    } catch (_) {}
+    fetch("/track.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+      keepalive: true,
+      credentials: "omit"
+    }).catch(() => {});
+  };
+
+  const firstPartyEvent = (event, params) => {
+    if (event === "call_click") return params.phone === "secondary" ? "phone_secondary" : "phone_primary";
+    if (event === "geolocation_start") return "location_open";
+    if (["whatsapp_open", "request_prepared", "sms_open"].includes(event)) return event;
+    return "";
+  };
 
   const gtagQueue = (...args) => {
     if (gtagLoaded && typeof window.gtag === "function") window.gtag(...args);
@@ -91,6 +152,7 @@
   const track = (event, params = {}) => {
     const clean = sanitize(params);
     window.dataLayer.push({ event, ...clean });
+    sendFirstParty(firstPartyEvent(event, clean));
     if (gtagLoaded) {
       gtagQueue("event", event, clean);
       if (event === "call_click" || event === "whatsapp_open") sendConversion(event);
@@ -113,6 +175,16 @@
 
   // Consent Mode v2 defaults must be set before any tag loads.
   gtagQueue("consent", "default", defaultConsent);
+
+  const startFirstParty = () => {
+    sendFirstParty("page_view");
+    sendFirstParty("heartbeat");
+    window.setInterval(() => {
+      if (document.visibilityState === "visible") sendFirstParty("heartbeat");
+    }, 60000);
+  };
+  if ("requestIdleCallback" in window) window.requestIdleCallback(startFirstParty, { timeout: 1200 });
+  else window.setTimeout(startFirstParty, 350);
 
   // Phone click attribution: works on every page, incl. additional services.
   const zone = (element) => element?.closest("header") ? "header"

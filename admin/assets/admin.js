@@ -22,6 +22,8 @@
     pageSearch: "",
     mediaTarget: null,
     confirmResolve: null,
+    audit: null,
+    auditLoading: false,
   };
 
   const uid = () => globalThis.crypto?.randomUUID?.() || `block-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -44,6 +46,24 @@
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
     return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  };
+
+  const formatNumber = (value = 0) => new Intl.NumberFormat("lv-LV").format(Number(value) || 0);
+
+  const activityLabel = (entry) => {
+    const labels = {
+      save_page: "Saglabāja lapas melnrakstu",
+      save_contacts: "Mainīja kontaktus melnrakstā",
+      publish: "Publicēja vietni",
+      discard_draft: "Atcēla melnraksta izmaiņas",
+      restore_revision: "Atjaunoja iepriekšējo versiju",
+      upload_image: "Pievienoja attēlu",
+      delete_image: "Izdzēsa attēlu",
+      change_password: "Nomainīja savu paroli",
+      logout: "Izgāja no paneļa",
+    };
+    const detail = entry.details?.page || entry.details?.file || entry.details?.revision || "";
+    return `${labels[entry.action] || "Veica darbību"}${detail ? ` · ${detail}` : ""}`;
   };
 
   const api = async (action, options = {}) => {
@@ -119,7 +139,7 @@
     state.view = view;
     state.page = null;
     document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("is-active", button.dataset.view === view));
-    const titles = { dashboard: "Pārskats", pages: "Lapas", media: "Attēli", settings: "Kontakti", history: "Versijas" };
+    const titles = { dashboard: "Pārskats", analytics: "Statistika", pages: "Lapas", media: "Attēli", optimization: "Optimizācija", settings: "Kontakti", history: "Versijas" };
     viewTitle.textContent = titles[view] || "Vadība";
     previewButton.disabled = true;
     sidebar.classList.remove("is-open");
@@ -134,22 +154,23 @@
     </div>`;
 
   const renderDashboard = () => {
-    const { stats, health, published_at: publishedAt } = state.data;
+    const { stats, health, analytics, backups, activity, published_at: publishedAt } = state.data;
     workspace.innerHTML = `<div class="workspace-inner">
-      ${renderIntro("Vadības centrs", "Viss svarīgais vienuviet.", "Pārvaldiet saturu kā konstruktorā: saglabājiet melnrakstu, pārbaudiet un publicējiet tikai gatavu versiju.")}
+      ${renderIntro("Vadības centrs", "Viss svarīgais vienuviet.", "Redziet apmeklējumu un darbību kopsavilkumu, pārvaldiet saturu un pārbaudiet vietnes tehnisko stāvokli.")}
       <section class="stats-grid" aria-label="Vietnes statistika">
-        <article class="stat-card"><p>Vietnes lapas</p><strong>${stats.pages}</strong><small>LV, RU un EN</small></article>
-        <article class="stat-card"><p>Valodas</p><strong>${stats.languages}</strong><small>savstarpēji sasaistītas</small></article>
-        <article class="stat-card"><p>Attēli</p><strong>${stats.media}</strong><small>mediju bibliotēkā</small></article>
-        <article class="stat-card"><p>Mainītas lapas</p><strong>${stats.edited_pages}</strong><small>caur vadības paneli</small></article>
+        <article class="stat-card stat-card--live"><p>Vietnē šobrīd</p><strong>${formatNumber(analytics.online_now)}</strong><small>aktīvi pēdējās 5 minūtēs</small></article>
+        <article class="stat-card"><p>Apmeklētāji · 30 d.</p><strong>${formatNumber(analytics.unique_visitors)}</strong><small>anonīmas pārlūka sesijas</small></article>
+        <article class="stat-card"><p>Tālruņa klikšķi · 30 d.</p><strong>${formatNumber(analytics.phone_clicks)}</strong><small>nevis savienoti zvani</small></article>
+        <article class="stat-card"><p>Palīdzības darbības · 30 d.</p><strong>${formatNumber(analytics.help_actions)}</strong><small>zvans, WhatsApp, vieta vai pieprasījums</small></article>
       </section>
       <div class="dashboard-grid">
         <section class="panel">
           <div class="panel__head"><h3>Ātrās darbības</h3><span class="kicker">DARBS</span></div>
           <div class="panel__body quick-list">
+            <button type="button" data-go="analytics"><span><strong>Atvērt detalizētu statistiku</strong><small>Dienas, populārākās lapas, ierīces un avoti</small></span><b>→</b></button>
             <button type="button" data-go="pages"><span><strong>Rediģēt lapas saturu</strong><small>Teksti, SEO, attēli un papildu bloki</small></span><b>→</b></button>
             <button type="button" data-go="media"><span><strong>Pievienot jaunus attēlus</strong><small>Automātiska samazināšana un WebP, ja serveris atbalsta</small></span><b>→</b></button>
-            <button type="button" data-go="settings"><span><strong>Mainīt tālruņus un e-pastu</strong><small>Vienlaikus visās lapās un valodās</small></span><b>→</b></button>
+            <button type="button" data-go="optimization"><span><strong>Pārbaudīt vietnes optimizāciju</strong><small>SEO, saites, attēli un servera stāvoklis</small></span><b>→</b></button>
           </div>
         </section>
         <section class="panel">
@@ -160,13 +181,123 @@
               ["Lapu rediģēšana", health.dom ? "Darbojas" : "Nav DOM"],
               ["Attēlu optimizācija", health.gd ? "Darbojas" : "Oriģināla režīms"],
               ["Datu saglabāšana", health.storage_writable && health.root_writable ? "Darbojas" : "Jāpārbauda"],
+              ["Diska izmantojums", health.disk_used_percent == null ? "Nav pieejams" : `${health.disk_used_percent}%`],
+              ["Dienas kopijas", `${backups.count}/${backups.retention_days}`],
             ].map(([label, value], index) => `<div class="health-item"><span>${escapeHtml(label)}</span><strong${index === 3 && !(health.storage_writable && health.root_writable) ? ' class="is-bad"' : ""}>${escapeHtml(String(value))}</strong></div>`).join("")}
             <div class="health-item"><span>Pēdējā publikācija</span><strong>${escapeHtml(formatDate(publishedAt))}</strong></div>
           </div>
         </section>
       </div>
+      <section class="panel activity-panel">
+        <div class="panel__head"><h3>Pēdējās darbības</h3><span class="kicker">ŽURNĀLS</span></div>
+        <div class="activity-list">${activity?.length ? activity.slice(0, 8).map((entry) => `<article><span class="activity-dot"></span><div><strong>${escapeHtml(activityLabel(entry))}</strong><small>${escapeHtml(entry.user || "sistēma")} · ${escapeHtml(formatDate(entry.at))}</small></div></article>`).join("") : `<div class="empty-state empty-state--compact"><strong>Žurnāls vēl ir tukšs</strong><p>Turpmāk satura izmaiņas un publicēšana te būs redzama.</p></div>`}</div>
+      </section>
+      <p class="data-note">${escapeHtml(analytics.notice)}</p>
     </div>`;
     workspace.querySelectorAll("[data-go]").forEach((button) => button.addEventListener("click", () => setView(button.dataset.go)));
+  };
+
+  const renderBreakdown = (title, rows, labels = {}) => {
+    const entries = Object.entries(rows || {});
+    const maximum = Math.max(1, ...entries.map(([, value]) => Number(value) || 0));
+    return `<section class="panel"><div class="panel__head"><h3>${escapeHtml(title)}</h3><span class="kicker">30 DIENAS</span></div><div class="panel__body breakdown-list">${entries.length ? entries.map(([label, value]) => `<div><span><strong>${escapeHtml(labels[label] || label)}</strong><small>${formatNumber(value)}</small></span><i><b style="width:${Math.max(2, Math.round((Number(value) / maximum) * 100))}%"></b></i></div>`).join("") : `<p class="muted-copy">Dati parādīsies pēc pirmajiem apmeklējumiem.</p>`}</div></section>`;
+  };
+
+  const renderAnalytics = () => {
+    const data = state.data.analytics;
+    const maximum = Math.max(1, ...data.daily.map((day) => day.help_actions));
+    workspace.innerHTML = `<div class="workspace-inner">
+      ${renderIntro("Reālie vietnes signāli", "Ko apmeklētāji dara vietnē.", "Anonīma pirmās puses statistika bez cookies. Skaitļi rāda pogu nospiedienus, nevis notikušas telefonsarunas.", `<button class="button button--ghost" type="button" data-refresh-analytics>Atjaunot datus</button>`)}
+      <section class="stats-grid" aria-label="30 dienu statistika">
+        <article class="stat-card stat-card--live"><p>Vietnē šobrīd</p><strong>${formatNumber(data.online_now)}</strong><small>aktīvi pēdējās 5 minūtēs</small></article>
+        <article class="stat-card"><p>Apmeklētāji</p><strong>${formatNumber(data.unique_visitors)}</strong><small>anonīmas sesijas</small></article>
+        <article class="stat-card"><p>Lapu skatījumi</p><strong>${formatNumber(data.page_views)}</strong><small>visās valodās</small></article>
+        <article class="stat-card"><p>Palīdzības darbības</p><strong>${formatNumber(data.help_actions)}</strong><small>${data.conversion_percent} darbības / 100 sesijām</small></article>
+      </section>
+      <section class="panel chart-panel">
+        <div class="panel__head"><div><h3>Darbības pa dienām</h3><small>Zvans, WhatsApp, atrašanās vieta vai sagatavots pieprasījums</small></div><span class="kicker">30 DIENAS</span></div>
+        <div class="bar-chart" aria-label="Palīdzības darbības pēdējās 30 dienās">${data.daily.map((day) => `<div class="bar-chart__day" title="${escapeHtml(day.date)} · ${formatNumber(day.help_actions)}"><i style="height:${day.help_actions ? Math.max(8, Math.round((day.help_actions / maximum) * 100)) : 2}%"></i><span>${escapeHtml(day.date.slice(8))}</span></div>`).join("")}</div>
+      </section>
+      <div class="stats-detail-grid">
+        ${renderBreakdown("Kontaktu darbības", {
+          "Galvenais tālrunis": data.totals.phone_primary,
+          "Otrais tālrunis": data.totals.phone_secondary,
+          "WhatsApp": data.totals.whatsapp_open,
+          "Atrašanās vieta": data.totals.location_open,
+          "Pieprasījums": data.totals.request_prepared,
+        })}
+        ${renderBreakdown("Ierīces", data.devices, { mobile: "Mobilais", tablet: "Planšete", desktop: "Dators" })}
+        ${renderBreakdown("Valodas", data.languages, { lv: "Latviešu", ru: "Krievu", en: "Angļu" })}
+        ${renderBreakdown("Apmeklējuma avoti", data.sources, { direct: "Tieši", google: "Google", bing: "Bing", facebook: "Facebook", instagram: "Instagram", whatsapp: "WhatsApp", other: "Cits" })}
+      </div>
+      <section class="panel top-pages-panel">
+        <div class="panel__head"><h3>Populārākās lapas</h3><span class="kicker">SKATĪJUMI</span></div>
+        <div class="ranking-list">${Object.entries(data.top_pages || {}).length ? Object.entries(data.top_pages).map(([path, row], index) => `<article><b>${String(index + 1).padStart(2, "0")}</b><code>${escapeHtml(path)}</code><strong>${formatNumber(row.page_view)}</strong></article>`).join("") : `<div class="empty-state empty-state--compact"><strong>Vēl nav datu</strong><p>Pirmie apmeklējumi šeit parādīsies automātiski.</p></div>`}</div>
+      </section>
+      <p class="data-note">Dati glabājas šajā serverī, bez IP adresēm un formas satura. ${data.updated_at ? `Pēdējais ieraksts: ${escapeHtml(formatDate(data.updated_at))}.` : "Uzskaite sāksies pēc šīs versijas publicēšanas."}</p>
+    </div>`;
+    workspace.querySelector("[data-refresh-analytics]")?.addEventListener("click", async (event) => {
+      event.currentTarget.disabled = true;
+      try {
+        const payload = await api("analytics");
+        state.data.analytics = payload.analytics;
+        renderAnalytics();
+      } catch (error) { toast(error.message, "error"); }
+    });
+  };
+
+  const loadAudit = async (force = false) => {
+    if (state.auditLoading) return;
+    state.auditLoading = true;
+    try {
+      const payload = await api("audit", { query: force ? "&refresh=1" : "" });
+      state.audit = payload.audit;
+      state.data.health = payload.health;
+      state.data.backups = payload.backups;
+    } catch (error) {
+      toast(error.message, "error");
+    } finally {
+      state.auditLoading = false;
+      if (state.view === "optimization") renderOptimization();
+    }
+  };
+
+  const renderOptimization = () => {
+    if (!state.audit) {
+      workspace.innerHTML = `<div class="workspace-inner">${renderIntro("Droša pārbaude", "Pārbaudām vietni.", "SEO, saites, attēli un servera pieejamība tiek pārbaudīta, neko automātiski nepārrakstot.")}<div class="loading-state"><span class="loader"></span><p>Analizē visas lapas…</p></div></div>`;
+      loadAudit(false);
+      return;
+    }
+    const audit = state.audit;
+    const health = state.data.health;
+    const backups = state.data.backups;
+    const status = audit.score >= 85 ? "Labi" : audit.score >= 65 ? "Jāpiestrādā" : "Jāpārbauda";
+    workspace.innerHTML = `<div class="workspace-inner">
+      ${renderIntro("SEO un tehniskais audits", "Vietnes stāvoklis bez minējumiem.", "Pārbaude neko nelabo automātiski: vispirms redzat konkrētu problēmu un lapu, pēc tam pieņemat lēmumu.", `<button class="button button--ghost" type="button" data-refresh-audit>Atkārtot pārbaudi</button>`)}
+      <div class="audit-overview">
+        <section class="audit-score"><span>TEHNISKAIS VĒRTĒJUMS</span><strong>${audit.score}</strong><p>${escapeHtml(status)} · pārbaudītas ${audit.pages_checked} lapas</p></section>
+        <section class="audit-counts"><article><strong>${audit.counts.error}</strong><span>Kļūdas</span></article><article><strong>${audit.counts.warning}</strong><span>Brīdinājumi</span></article><article><strong>${backups.count}</strong><span>Dienas kopijas</span></article></section>
+      </div>
+      <div class="dashboard-grid audit-system-grid">
+        <section class="panel"><div class="panel__head"><h3>Servera stāvoklis</h3><span class="status-chip status-chip--ok">DARBOJAS</span></div><div class="panel__body health-list">
+          <div class="health-item"><span>Paneļa atbildes laiks</span><strong>${health.response_ms == null ? "—" : `${health.response_ms} ms`}</strong></div>
+          <div class="health-item"><span>Servera slodze · 1 min.</span><strong>${health.load_1m == null ? "Nav pieejama" : health.load_1m}</strong></div>
+          <div class="health-item"><span>Diska izmantojums</span><strong>${health.disk_used_percent == null ? "Nav pieejams" : `${health.disk_used_percent}%`}</strong></div>
+          <div class="health-item"><span>Brīvā vieta</span><strong>${health.disk_free == null ? "—" : formatBytes(health.disk_free)}</strong></div>
+          <div class="health-item"><span>PHP / atmiņas limits</span><strong>${escapeHtml(health.php)} / ${escapeHtml(health.memory_limit)}</strong></div>
+          <div class="health-item"><span>Saglabāšana</span><strong${health.storage_writable && health.root_writable ? "" : ' class="is-bad"'}>${health.storage_writable && health.root_writable ? "Darbojas" : "Jāpārbauda"}</strong></div>
+        </div></section>
+        <section class="panel"><div class="panel__head"><h3>Automātiskā aizsardzība</h3><span class="kicker">30 DIENAS</span></div><div class="panel__body backup-card"><strong>${escapeHtml(backups.latest || "—")}</strong><p>Pēdējā LIVE satura dienas kopija. Tiek glabātas līdz ${backups.retention_days} dienām.</p><a class="button button--ghost" href="/admin/export.php">Lejupielādēt pašreizējo kopiju</a></div></section>
+      </div>
+      <section class="panel issues-panel"><div class="panel__head"><div><h3>Pārbaudes rezultāti</h3><small>${escapeHtml(formatDate(audit.checked_at))}</small></div><span class="kicker">${audit.issues.length} IERAKSTI</span></div><div class="issue-list">${audit.issues.length ? audit.issues.map((issue) => `<article class="issue issue--${escapeHtml(issue.severity)}"><span>${issue.severity === "error" ? "!" : "·"}</span><div><strong>${escapeHtml(issue.title)}</strong><small>${escapeHtml(issue.page)}</small><p>${escapeHtml(issue.detail)}</p></div></article>`).join("") : `<div class="empty-state empty-state--compact"><strong>Kļūdas nav atrastas</strong><p>Tehniskā struktūra izskatās kārtībā.</p></div>`}</div></section>
+      <p class="data-note">${escapeHtml(audit.note)}</p>
+    </div>`;
+    workspace.querySelector("[data-refresh-audit]")?.addEventListener("click", (event) => {
+      event.currentTarget.disabled = true;
+      state.audit = null;
+      loadAudit(true);
+      renderOptimization();
+    });
   };
 
   const renderPages = () => {
@@ -573,8 +704,10 @@
 
   const renderView = () => {
     if (!state.data) return;
-    if (state.view === "pages") renderPages();
+    if (state.view === "analytics") renderAnalytics();
+    else if (state.view === "pages") renderPages();
     else if (state.view === "media") renderMedia();
+    else if (state.view === "optimization") renderOptimization();
     else if (state.view === "settings") renderSettings();
     else if (state.view === "history") renderHistory();
     else renderDashboard();

@@ -5,6 +5,7 @@ define('CMS_ROOT', dirname(__DIR__, 2));
 define('CMS_ADMIN_ROOT', dirname(__DIR__));
 define('CMS_STORAGE', CMS_ADMIN_ROOT . DIRECTORY_SEPARATOR . 'storage');
 define('CMS_UPLOADS', CMS_ROOT . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'uploads');
+define('CMS_REQUEST_STARTED', microtime(true));
 
 if (!is_dir(CMS_STORAGE)) {
     @mkdir(CMS_STORAGE, 0750, true);
