@@ -14,12 +14,16 @@ const CONCEPT_BASE = "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept
 const PRODUCTION_BASE = "https://autopalidziba.lv";
 const CONCEPT_ROBOTS = "noindex, nofollow";
 const PRODUCTION_ROBOTS = "index, follow";
-const LASTMOD = "2026-09-09";
+const LASTMOD = "2026-09-10";
 const MENU_OPEN = { lv: "Atvērt izvēlni", ru: "Открыть меню", en: "Open menu" };
 const ADDITIONAL_SERVICES_DIR = {
   lv: ["citi-pakalpojumi"],
   ru: ["ru", "drugie-uslugi"],
   en: ["en", "other-services"]
+};
+const ADDITIONAL_INDEXABLE = {
+  hub: { lv: ["citi-pakalpojumi"], ru: ["ru", "drugie-uslugi"], en: ["en", "other-services"] },
+  fitness: { lv: ["fitness"], ru: ["ru", "fitnes"], en: ["en", "fitness"] }
 };
 
 const production = process.argv.includes("--production");
@@ -815,6 +819,17 @@ function sitemap() {
       const alternates = LANGS.map((l) => `    <xhtml:link rel="alternate" hreflang="${LANG_META[l].hreflang}" href="${langUrl(l, page)}"/>`).join("\n") + `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${langUrl("lv", page)}"/>`;
       entries.push(`  <url>
     <loc>${langUrl(lang, page)}</loc>
+    <lastmod>${LASTMOD}</lastmod>
+${alternates}
+  </url>`);
+    }
+  }
+  for (const page of Object.keys(ADDITIONAL_INDEXABLE)) {
+    for (const lang of LANGS) {
+      const pageUrl = (code) => `${BASE}/${ADDITIONAL_INDEXABLE[page][code].join("/")}/`;
+      const alternates = LANGS.map((code) => `    <xhtml:link rel="alternate" hreflang="${LANG_META[code].hreflang}" href="${pageUrl(code)}"/>`).join("\n") + `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${pageUrl("lv")}"/>`;
+      entries.push(`  <url>
+    <loc>${pageUrl(lang)}</loc>
     <lastmod>${LASTMOD}</lastmod>
 ${alternates}
   </url>`);
