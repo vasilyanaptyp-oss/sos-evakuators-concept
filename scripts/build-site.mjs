@@ -8,7 +8,8 @@ import { fileURLToPath } from "node:url";
 import { LANGS, LANG_META, SERVICES, T, BUSINESS, SERVICE_OG } from "./site-content.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const ASSETS_V = "20260910-private-insights";
+const ASSETS_V = "20260909-new-services-gallery";
+const ANALYTICS_V = "20260910-private-insights";
 const CONCEPT_BASE = "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
 const PRODUCTION_BASE = "https://autopalidziba.lv";
 const CONCEPT_ROBOTS = "noindex, nofollow";
@@ -297,7 +298,7 @@ function locationSheet(lang) {
 
 const scripts = (lang, dirSegments) => {
   const assetPrefix = rel(dirSegments, []);
-  return `  <script src="${assetPrefix}assets/js/analytics.js?v=${ASSETS_V}" defer></script>
+  return `  <script src="${assetPrefix}assets/js/analytics.js?v=${ANALYTICS_V}" defer></script>
   <script src="${assetPrefix}app.js?v=${ASSETS_V}" data-base="${assetPrefix}"></script>`;
 };
 
@@ -617,6 +618,7 @@ function servicePage(lang, key) {
   const dirSegments = dirOf(lang, key);
   const homeHref = rel(dirSegments, dirOf(lang, "home"));
   const assetPrefix = rel(dirSegments, []);
+  const heroMapAsset = `hero-map-${lang}`;
   const related = SERVICES.filter((svc) => svc.key !== key).slice(0, 3);
 
   const photosHtml = s.photos.length > 2
@@ -687,6 +689,9 @@ ${mobileMenu(lang, key, dirSegments)}
           <span class="hero-line"><span>${esc(p.h1)}</span></span>
         </h1>
         <p class="hero-tagline reveal-item">${esc(p.tagline)}</p>
+        <figure class="hero-map reveal-item">
+          <img src="${assetPrefix}assets/images/${heroMapAsset}-1280.webp" srcset="${assetPrefix}assets/images/${heroMapAsset}-640.webp 640w, ${assetPrefix}assets/images/${heroMapAsset}-1280.webp 1280w" sizes="(max-width: 820px) 100vw, 1px" width="1280" height="720" alt="${esc(t.hero.mapAlt)}" loading="lazy" decoding="async">
+        </figure>
         <div class="hero-cta-row reveal-item">
           <p class="hero-cta-hint">${esc(t.hero.ctaHint)}</p>
           <a class="primary-cta primary-cta--big magnetic call-attention call-rattle" href="tel:${BUSINESS.phone}" data-dock-watch>
@@ -695,6 +700,10 @@ ${mobileMenu(lang, key, dirSegments)}
           </a>
         </div>
       </div>
+    </section>
+
+    <section class="second-call-strip" aria-label="${esc(t.secondPhoneSmall)}">
+      <p><span>${esc(t.hero.secondLine)}</span> <a href="tel:${BUSINESS.phoneSecondary}">${BUSINESS.phoneSecondaryDisplay}</a></p>
     </section>
 
     <section class="svc-section" aria-labelledby="about-title">
