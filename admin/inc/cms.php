@@ -163,10 +163,58 @@ function cms_ensure_baseline(string $page): void
     @chmod($baseline, 0640);
 }
 
+function cms_page_has_saved_overrides(string $page): bool
+{
+    static $pagesWithOverrides = null;
+    if ($pagesWithOverrides === null) {
+        $pagesWithOverrides = [];
+        foreach (['draft', 'live'] as $kind) {
+            $path = cms_state_path($kind);
+            if (!is_file($path)) {
+                continue;
+            }
+            $state = cms_read_json($path, cms_default_state());
+            foreach (array_keys((array) ($state['pages'] ?? [])) as $savedPage) {
+                $pagesWithOverrides[(string) $savedPage] = true;
+            }
+        }
+    }
+    return isset($pagesWithOverrides[$page]);
+}
+
+function cms_sync_unedited_baseline(string $page): void
+{
+    if (cms_page_has_saved_overrides($page)) {
+        return;
+    }
+
+    $source = CMS_ROOT . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $page);
+    $baseline = cms_baseline_path($page);
+    if (!is_file($source) || !is_file($baseline)) {
+        return;
+    }
+
+    $sourceHtml = @file_get_contents($source);
+    $baselineHtml = @file_get_contents($baseline);
+    if ($sourceHtml === false || $baselineHtml === false || hash_equals(hash('sha256', $sourceHtml), hash('sha256', $baselineHtml))) {
+        return;
+    }
+
+    $temporary = $baseline . '.sync-' . bin2hex(random_bytes(4));
+    if (@file_put_contents($temporary, $sourceHtml, LOCK_EX) === false) {
+        return;
+    }
+    @chmod($temporary, 0640);
+    if (!@rename($temporary, $baseline)) {
+        @unlink($temporary);
+    }
+}
+
 function cms_read_baseline(string $page): string
 {
     $page = cms_normalize_page($page);
     cms_ensure_baseline($page);
+    cms_sync_unedited_baseline($page);
     $html = @file_get_contents(cms_baseline_path($page));
     if ($html === false) {
         throw new RuntimeException('Neizdevās nolasīt lapu.');

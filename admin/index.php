@@ -32,7 +32,7 @@ if (!cms_is_authenticated()):
   <meta name="theme-color" content="#0b0c0d">
   <title>Autopalīdzība · Vadības panelis</title>
   <link rel="icon" href="/assets/images/logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/admin/assets/admin.css?v=2">
+  <link rel="stylesheet" href="/admin/assets/admin.css?v=3">
 </head>
 <body class="login-page">
   <main class="login-shell">
@@ -86,7 +86,7 @@ cms_touch_session();
   <meta name="theme-color" content="#0b0c0d">
   <title>Autopalīdzība · Vadības panelis</title>
   <link rel="icon" href="/assets/images/logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/admin/assets/admin.css?v=2">
+  <link rel="stylesheet" href="/admin/assets/admin.css?v=3">
 </head>
 <body class="admin-page" data-csrf="<?= cms_h(cms_csrf_token()) ?>">
   <a class="skip-link" href="#workspace">Pāriet uz saturu</a>
@@ -110,6 +110,7 @@ cms_touch_session();
         <button type="button" data-logout>Iziet</button>
       </div>
     </aside>
+    <button class="sidebar-backdrop" type="button" data-sidebar-close aria-label="Aizvērt izvēlni" hidden></button>
 
     <div class="admin-main">
       <header class="topbar">
@@ -157,6 +158,6 @@ cms_touch_session();
   </div>
 
   <div class="toast-stack" aria-live="polite" aria-atomic="true" data-toasts></div>
-  <script src="/admin/assets/admin.js?v=2" defer></script>
+  <script src="/admin/assets/admin.js?v=3" defer></script>
 </body>
 </html>

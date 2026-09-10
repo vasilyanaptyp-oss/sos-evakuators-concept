@@ -13,6 +13,9 @@
   const pickerGrid = document.querySelector("[data-media-picker-grid]");
   const sidebar = document.querySelector("#sidebar");
   const mobileToggle = document.querySelector(".mobile-nav-toggle");
+  const sidebarBackdrop = document.querySelector("[data-sidebar-close]");
+  const workspaceRoot = document.querySelector("#workspace");
+  const mobileNavigation = window.matchMedia("(max-width: 820px)");
 
   const state = {
     data: null,
@@ -135,6 +138,31 @@
   document.querySelectorAll("[data-confirm-cancel]").forEach((button) => button.addEventListener("click", () => closeConfirm(false)));
   document.querySelector("[data-confirm-ok]")?.addEventListener("click", () => closeConfirm(true));
 
+  const setSidebarOpen = (open, returnFocus = false) => {
+    const mobile = mobileNavigation.matches;
+    const shouldOpen = mobile && Boolean(open);
+    sidebar.classList.toggle("is-open", shouldOpen);
+    body.classList.toggle("has-sidebar-open", shouldOpen);
+    mobileToggle?.setAttribute("aria-expanded", String(shouldOpen));
+    sidebarBackdrop.hidden = !shouldOpen;
+    sidebar.inert = mobile && !shouldOpen;
+    sidebar.setAttribute("aria-hidden", mobile && !shouldOpen ? "true" : "false");
+    if (!shouldOpen && returnFocus) mobileToggle?.focus();
+  };
+
+  const resetViewPosition = (focusContent = false) => {
+    window.requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      if (workspaceRoot) workspaceRoot.scrollTop = 0;
+      if (focusContent && mobileNavigation.matches) workspaceRoot?.focus({ preventScroll: true });
+    });
+  };
+
+  const syncSidebarMode = () => setSidebarOpen(sidebar.classList.contains("is-open"));
+  if (typeof mobileNavigation.addEventListener === "function") mobileNavigation.addEventListener("change", syncSidebarMode);
+  else mobileNavigation.addListener(syncSidebarMode);
+  setSidebarOpen(false);
+
   const setView = (view) => {
     state.view = view;
     state.page = null;
@@ -142,9 +170,9 @@
     const titles = { dashboard: "Pārskats", analytics: "Statistika", pages: "Lapas", media: "Attēli", optimization: "Optimizācija", settings: "Kontakti", history: "Versijas" };
     viewTitle.textContent = titles[view] || "Vadība";
     previewButton.disabled = true;
-    sidebar.classList.remove("is-open");
-    mobileToggle?.setAttribute("aria-expanded", "false");
+    setSidebarOpen(false);
     renderView();
+    resetViewPosition(true);
   };
 
   const renderIntro = (kicker, title, text, actions = "") => `
@@ -340,6 +368,7 @@
       viewTitle.textContent = "Lapas redaktors";
       previewButton.disabled = false;
       renderEditor();
+      resetViewPosition(true);
     } catch (error) {
       toast(error.message, "error");
       renderPages();
@@ -742,10 +771,8 @@
     window.open(`/admin/preview.php?page=${encodeURIComponent(state.page.path)}`, "_blank", "noopener");
   });
   document.querySelectorAll("[data-view]").forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
-  mobileToggle?.addEventListener("click", () => {
-    const open = sidebar.classList.toggle("is-open");
-    mobileToggle.setAttribute("aria-expanded", String(open));
-  });
+  mobileToggle?.addEventListener("click", () => setSidebarOpen(!sidebar.classList.contains("is-open")));
+  sidebarBackdrop?.addEventListener("click", () => setSidebarOpen(false, true));
   document.querySelector("[data-logout]")?.addEventListener("click", async () => {
     try {
       const payload = await api("logout", { method: "POST", body: {} });
@@ -754,6 +781,7 @@
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
+      if (sidebar.classList.contains("is-open")) setSidebarOpen(false, true);
       if (!picker.hidden) closeMediaPicker();
       if (!document.querySelector("[data-confirm]").hidden) closeConfirm(false);
       const fullPreview = document.querySelector(".editor-preview.is-desktop");
