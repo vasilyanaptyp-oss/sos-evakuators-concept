@@ -1181,6 +1181,8 @@ function cms_analytics_summary(int $days = 30): array
     $devices = [];
     $sources = [];
     $lastUpdated = null;
+    $heatmap = array_fill(0, 7, array_fill(0, 24, ['page_view' => 0, 'help_actions' => 0]));
+    $heatmapDays = 0;
 
     for ($offset = $days - 1; $offset >= 0; $offset--) {
         $date = date('Y-m-d', strtotime('-' . $offset . ' days'));
@@ -1207,6 +1209,18 @@ function cms_analytics_summary(int $days = 30): array
         }
         foreach ((array) ($data['sources'] ?? []) as $label => $count) {
             $sources[(string) $label] = (int) ($sources[(string) $label] ?? 0) + (int) $count;
+        }
+        if (!empty($data['hours']) && is_array($data['hours'])) {
+            $weekday = ((int) date('N', strtotime($date))) - 1; // 0 = Monday
+            $heatmapDays++;
+            foreach ($data['hours'] as $hour => $row) {
+                $hour = (int) $hour;
+                if ($hour < 0 || $hour > 23 || !is_array($row)) {
+                    continue;
+                }
+                $heatmap[$weekday][$hour]['page_view'] += (int) ($row['page_view'] ?? 0);
+                $heatmap[$weekday][$hour]['help_actions'] += (int) ($row['help_actions'] ?? 0);
+            }
         }
         if (!empty($data['updated_at']) && ($lastUpdated === null || strcmp((string) $data['updated_at'], $lastUpdated) > 0)) {
             $lastUpdated = (string) $data['updated_at'];
@@ -1253,6 +1267,7 @@ function cms_analytics_summary(int $days = 30): array
         'devices' => $devices,
         'sources' => $sources,
         'updated_at' => $lastUpdated,
+        'heatmap' => ['days' => $heatmapDays, 'cells' => $heatmap, 'timezone' => date_default_timezone_get()],
         'notice' => 'Tiek skaitīti pogu nospiedieni, nevis savienoti vai atbildēti zvani.',
     ];
 }

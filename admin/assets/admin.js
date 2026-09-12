@@ -235,6 +235,40 @@
     return `<section class="panel"><div class="panel__head"><h3>${escapeHtml(title)}</h3><span class="kicker">30 DIENAS</span></div><div class="panel__body breakdown-list">${entries.length ? entries.map(([label, value]) => `<div><span><strong>${escapeHtml(labels[label] || label)}</strong><small>${formatNumber(value)}</small></span><i><b style="width:${Math.max(2, Math.round((Number(value) / maximum) * 100))}%"></b></i></div>`).join("") : `<p class="muted-copy">Dati parādīsies pēc pirmajiem apmeklējumiem.</p>`}</div></section>`;
   };
 
+
+  const renderHeatmap = (heatmap) => {
+    const cells = heatmap?.cells || [];
+    const metric = state.heatmapMetric || "help_actions";
+    const weekdays = ["Pr", "Ot", "Tr", "Ce", "Pk", "Se", "Sv"];
+    const values = cells.flatMap((row) => row.map((cell) => Number(cell?.[metric]) || 0));
+    const maximum = Math.max(1, ...values);
+    const total = values.reduce((sum, value) => sum + value, 0);
+    const byHour = Array.from({ length: 24 }, (_, hour) => cells.reduce((sum, row) => sum + (Number(row?.[hour]?.[metric]) || 0), 0));
+    const byDay = cells.map((row) => row.reduce((sum, cell) => sum + (Number(cell?.[metric]) || 0), 0));
+    const peakHours = byHour.map((value, hour) => ({ hour, value })).filter((item) => item.value > 0).sort((a, b) => b.value - a.value).slice(0, 3);
+    const peakDay = byDay.indexOf(Math.max(...byDay));
+    const label = metric === "help_actions" ? "darbības" : "skatījumi";
+    const summary = total
+      ? `Aktīvākās stundas: ${peakHours.map((item) => `${String(item.hour).padStart(2, "0")}:00`).join(", ")}. Aktīvākā diena: ${["pirmdiena", "otrdiena", "trešdiena", "ceturtdiena", "piektdiena", "sestdiena", "svētdiena"][peakDay]}.`
+      : "Karte pildās automātiski — pirmie dati parādīsies pēc dažām stundām.";
+    return `<section class="panel heatmap-panel">
+      <div class="panel__head"><div><h3>Stundas un nedēļas dienas</h3><small>Kad apmeklētāji ir vietnē un kad viņi zvana vai raksta · ${escapeHtml(heatmap?.timezone || "serveris")}</small></div>
+        <div class="filter-group" role="group" aria-label="Rādītājs">${[["help_actions", "Darbības"], ["page_view", "Skatījumi"]].map(([key, text]) => `<button type="button" data-heatmap-metric="${key}" class="${metric === key ? "is-active" : ""}">${text}</button>`).join("")}</div></div>
+      <div class="panel__body">
+        <div class="heatmap" role="img" aria-label="Aktivitāte pa nedēļas dienām un stundām">
+          <div class="heatmap__corner"></div>
+          ${Array.from({ length: 24 }, (_, hour) => `<div class="heatmap__hour">${hour % 3 === 0 ? String(hour).padStart(2, "0") : ""}</div>`).join("")}
+          ${weekdays.map((day, dayIndex) => `<div class="heatmap__day">${day}</div>${Array.from({ length: 24 }, (_, hour) => {
+            const value = Number(cells?.[dayIndex]?.[hour]?.[metric]) || 0;
+            const level = value ? Math.max(0.18, value / maximum) : 0;
+            return `<div class="heatmap__cell" style="--level:${level.toFixed(2)}" title="${day} ${String(hour).padStart(2, "0")}:00 · ${formatNumber(value)} ${label}"></div>`;
+          }).join("")}`).join("")}
+        </div>
+        <p class="heatmap__summary">${escapeHtml(summary)} ${heatmap?.days ? `Dati par ${formatNumber(heatmap.days)} d.` : ""}</p>
+      </div>
+    </section>`;
+  };
+
   const renderAnalytics = () => {
     const data = state.data.analytics;
     const maximum = Math.max(1, ...data.daily.map((day) => day.help_actions));
@@ -250,6 +284,7 @@
         <div class="panel__head"><div><h3>Darbības pa dienām</h3><small>Zvans, WhatsApp, atrašanās vieta vai sagatavots pieprasījums</small></div><span class="kicker">30 DIENAS</span></div>
         <div class="bar-chart" aria-label="Palīdzības darbības pēdējās 30 dienās">${data.daily.map((day) => `<div class="bar-chart__day" title="${escapeHtml(day.date)} · ${formatNumber(day.help_actions)}"><i style="height:${day.help_actions ? Math.max(8, Math.round((day.help_actions / maximum) * 100)) : 2}%"></i><span>${escapeHtml(day.date.slice(8))}</span></div>`).join("")}</div>
       </section>
+      ${renderHeatmap(data.heatmap)}
       <div class="stats-detail-grid">
         ${renderBreakdown("Kontaktu darbības", {
           "Galvenais tālrunis": data.totals.phone_primary,
@@ -268,6 +303,7 @@
       </section>
       <p class="data-note">Dati glabājas šajā serverī, bez IP adresēm un formas satura. ${data.updated_at ? `Pēdējais ieraksts: ${escapeHtml(formatDate(data.updated_at))}.` : "Uzskaite sāksies pēc šīs versijas publicēšanas."}</p>
     </div>`;
+    workspace.querySelectorAll("[data-heatmap-metric]").forEach((button) => button.addEventListener("click", () => { state.heatmapMetric = button.dataset.heatmapMetric; renderAnalytics(); }));
     workspace.querySelector("[data-refresh-analytics]")?.addEventListener("click", async (event) => {
       event.currentTarget.disabled = true;
       try {

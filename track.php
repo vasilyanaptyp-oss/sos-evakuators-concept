@@ -199,6 +199,11 @@ try {
         if (isset($daily['pages'][$path])) {
             $daily['pages'][$path][$event] = min(1000000, (int) ($daily['pages'][$path][$event] ?? 0) + 1);
         }
+        $hour = (string) ((int) date('G', $now));
+        $hourRow = isset($daily['hours'][$hour]) && is_array($daily['hours'][$hour]) ? $daily['hours'][$hour] : [];
+        $hourKey = $event === 'page_view' ? 'page_view' : 'help_actions';
+        $hourRow[$hourKey] = min(1000000, (int) ($hourRow[$hourKey] ?? 0) + 1);
+        $daily['hours'][$hour] = $hourRow;
         if ($event === 'page_view') {
             foreach (['languages' => $language, 'devices' => $device, 'sources' => $source] as $bucket => $label) {
                 $daily[$bucket][$label] = min(1000000, (int) ($daily[$bucket][$label] ?? 0) + 1);
