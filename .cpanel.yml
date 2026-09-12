@@ -1,0 +1,38 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home2/autopalidziba/public_html/
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/cp .htaccess $DEPLOYPATH
+    - /bin/cp 404.html $DEPLOYPATH
+    - /bin/cp additional-services.css $DEPLOYPATH
+    - /bin/cp additional-services.js $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH/admin
+    - /bin/cp -R admin/.htaccess $DEPLOYPATH/admin/
+    - /bin/cp -R admin/api.php $DEPLOYPATH/admin/
+    - /bin/cp -R admin/assets $DEPLOYPATH/admin/
+    - /bin/cp -R admin/export.php $DEPLOYPATH/admin/
+    - /bin/cp -R admin/inc $DEPLOYPATH/admin/
+    - /bin/cp -R admin/index.php $DEPLOYPATH/admin/
+    - /bin/cp -R admin/preview.php $DEPLOYPATH/admin/
+    - /bin/mkdir -p $DEPLOYPATH/admin/storage
+    - /bin/cp -R aku-tirisana $DEPLOYPATH
+    - /bin/cp app.js $DEPLOYPATH
+    - /bin/cp -R assets $DEPLOYPATH
+    - /bin/cp -R atkritumu-izvesana $DEPLOYPATH
+    - /bin/cp -R auto-izvilkshana $DEPLOYPATH
+    - /bin/cp -R autoevakuators $DEPLOYPATH
+    - /bin/cp -R automanipulatora-darbi $DEPLOYPATH
+    - /bin/cp -R citi-pakalpojumi $DEPLOYPATH
+    - /bin/cp -R en $DEPLOYPATH
+    - /bin/cp -R evakuators-latgale $DEPLOYPATH
+    - /bin/cp -R fitness $DEPLOYPATH
+    - /bin/cp index.html $DEPLOYPATH
+    - /bin/cp -R kravas-evakuators $DEPLOYPATH
+    - /bin/cp -R palidziba-uz-cela $DEPLOYPATH
+    - /bin/cp robots.txt $DEPLOYPATH
+    - /bin/cp -R ru $DEPLOYPATH
+    - /bin/cp sitemap.xml $DEPLOYPATH
+    - /bin/cp styles.css $DEPLOYPATH
+    - /bin/cp track.php $DEPLOYPATH
+    - /bin/cp -R treileris $DEPLOYPATH
