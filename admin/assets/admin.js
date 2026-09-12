@@ -57,6 +57,8 @@
     const labels = {
       save_page: "Saglabāja lapas melnrakstu",
       save_contacts: "Mainīja kontaktus melnrakstā",
+      save_prices: "Mainīja cenas melnrakstā",
+      save_services: "Mainīja papildu pakalpojumu redzamību",
       lead_status: "Mainīja pieteikuma statusu",
       lead_delete: "Dzēsa pieteikumu",
       save_notify: "Mainīja paziņojumu iestatījumus",
@@ -384,7 +386,7 @@
       </div>
       <div class="page-list">${filtered.length ? filtered.map((page) => `<button class="page-row" type="button" data-edit-page="${escapeHtml(page.path)}">
         <span class="page-row__lang">${escapeHtml(page.lang.toUpperCase())}</span>
-        <span><strong>${escapeHtml(page.title || "Lapa")}</strong><small>${escapeHtml(page.seo_title)}</small></span>
+        <span><strong>${escapeHtml(page.title || "Lapa")}${(state.data.hidden_pages || []).includes(page.path) ? ' <em class="page-row__hidden">paslēpta</em>' : ""}</strong><small>${escapeHtml(page.seo_title)}</small></span>
         <code>${escapeHtml(page.url)}</code><span class="page-row__arrow">→</span>
       </button>`).join("") : `<div class="empty-state"><strong>Nekas nav atrasts</strong><p>Mainiet meklēšanas tekstu vai valodas filtru.</p></div>`}</div>
     </div>`;
@@ -703,6 +705,7 @@
 
   const renderSettings = () => {
     const global = state.data.global;
+    const prices = state.data.prices || { auto: "30", auto_km: "0.80", kravas: "150", kravas_km: "1.50" };
     workspace.innerHTML = `<div class="workspace-inner">
       ${renderIntro("Globālie dati", "Vienreiz mainiet — visur atjaunojas.", "Galvenais un otrais tālrunis, kā arī e-pasts tiek atjaunots visās valodās un pakalpojumu lapās.", `<a class="button button--ghost" href="/admin/export.php">Lejupielādēt rezerves kopiju ↓</a>`)}
       <section class="panel form-panel">
@@ -715,6 +718,29 @@
             <label class="field field--wide"><span>E-pasts</span><input name="email" type="email" value="${escapeHtml(global.email)}" required></label>
           </div>
           <div class="form-actions"><button class="button button--primary" type="submit">Saglabāt melnrakstu</button></div>
+        </form>
+      </section>
+      <section class="panel form-panel" style="margin-top:18px">
+        <div class="panel__head"><h3>Cenas</h3><span class="kicker">VISAS VALODAS</span></div>
+        <form class="panel__body" data-prices-form>
+          <p class="settings-note">Cenas «no …» sākumlapā, pakalpojumu lapās, meta aprakstos un Google strukturētajos datos visās trīs valodās. Rakstiet tikai skaitli — «€» un valodas formāts tiek pievienoti automātiski. Pēc saglabāšanas nospiediet «Publicēt».</p>
+          <div class="settings-grid">
+            <label class="field"><span>Auto evakuators · no (€)</span><input name="price_auto" inputmode="decimal" value="${escapeHtml(prices.auto)}" required></label>
+            <label class="field"><span>Auto evakuators · par kilometru (€)</span><input name="price_auto_km" inputmode="decimal" value="${escapeHtml(prices.auto_km)}" required></label>
+            <label class="field"><span>Kravas evakuators · no (€)</span><input name="price_kravas" inputmode="decimal" value="${escapeHtml(prices.kravas)}" required></label>
+            <label class="field"><span>Kravas evakuators · par kilometru (€)</span><input name="price_kravas_km" inputmode="decimal" value="${escapeHtml(prices.kravas_km)}" required></label>
+          </div>
+          <div class="form-actions"><button class="button button--primary" type="submit">Saglabāt cenas</button></div>
+        </form>
+      </section>
+      <section class="panel form-panel" style="margin-top:18px">
+        <div class="panel__head"><h3>Papildu pakalpojumi</h3><span class="kicker">CITI PAKALPOJUMI</span></div>
+        <form class="panel__body" data-services-form>
+          <p class="settings-note">Paslēpts pakalpojums pazūd no lapas «Citi pakalpojumi» visās valodās, tā lapa novirza uz sarakstu un tiek izņemta no meklētājiem. Tekstus un attēlus katrai lapai maina sadaļā «Lapas».</p>
+          <div class="service-toggles">
+            ${(state.data.services || []).map((service) => `<label class="service-toggle${service.visible ? "" : " is-hidden"}"><input type="checkbox" name="visible" value="${escapeHtml(service.key)}" ${service.visible ? "checked" : ""}><span><strong>${escapeHtml(service.label)}</strong><small>${service.visible ? "Redzams vietnē" : "Paslēpts"} · <a href="${escapeHtml(service.url)}" target="_blank" rel="noopener">${escapeHtml(service.url)}</a></small></span></label>`).join("")}
+          </div>
+          <div class="form-actions"><button class="button button--primary" type="submit">Saglabāt redzamību</button></div>
         </form>
       </section>
       <section class="panel form-panel" style="margin-top:18px">
@@ -746,6 +772,30 @@
         state.data.global = payload.global;
         setDirty(payload.dirty);
         toast(payload.message);
+      } catch (error) { toast(error.message, "error"); }
+    });
+    workspace.querySelector("[data-prices-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      try {
+        const payload = await api("save-prices", { method: "POST", body: Object.fromEntries(form) });
+        state.data.prices = payload.prices;
+        setDirty(payload.dirty);
+        toast(payload.message);
+        renderSettings();
+      } catch (error) { toast(error.message, "error"); }
+    });
+    workspace.querySelector("[data-services-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const visible = [...event.currentTarget.querySelectorAll("input[name=visible]:checked")].map((input) => input.value);
+      const hidden = (state.data.services || []).map((service) => service.key).filter((key) => !visible.includes(key));
+      try {
+        const payload = await api("save-services", { method: "POST", body: { hidden } });
+        state.data.services = payload.services;
+        state.data.hidden_pages = payload.hidden_pages;
+        setDirty(payload.dirty);
+        toast(payload.message);
+        renderSettings();
       } catch (error) { toast(error.message, "error"); }
     });
     const notifyForm = workspace.querySelector("[data-notify-form]");

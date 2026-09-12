@@ -21,6 +21,9 @@ try {
             'media' => cms_media_list(),
             'revisions' => cms_list_revisions(),
             'global' => $draft['global'],
+            'prices' => cms_prices_get($draft['global']),
+            'services' => cms_services_get($draft['global']),
+            'hidden_pages' => cms_hidden_pages($draft['global']),
             'dirty' => cms_is_dirty(),
             'published_at' => $live['meta']['published_at'] ?? null,
             'health' => cms_health(),
@@ -77,6 +80,20 @@ try {
         $state = cms_save_global_draft($input);
         cms_activity_log('save_contacts');
         cms_json_response(['ok' => true, 'global' => $state['global'], 'dirty' => cms_is_dirty(), 'message' => 'Kontakti saglabāti melnrakstā.']);
+    }
+
+    if ($method === 'POST' && $action === 'save-prices') {
+        $input = cms_json_input();
+        $state = cms_save_prices_draft($input);
+        cms_activity_log('save_prices');
+        cms_json_response(['ok' => true, 'prices' => cms_prices_get($state['global']), 'dirty' => cms_is_dirty(), 'message' => 'Cenas saglabātas melnrakstā. Publicējiet, lai tās parādītos vietnē.']);
+    }
+
+    if ($method === 'POST' && $action === 'save-services') {
+        $input = cms_json_input();
+        $state = cms_save_services_draft($input);
+        cms_activity_log('save_services');
+        cms_json_response(['ok' => true, 'services' => cms_services_get($state['global']), 'hidden_pages' => cms_hidden_pages($state['global']), 'dirty' => cms_is_dirty(), 'message' => 'Pakalpojumu redzamība saglabāta melnrakstā. Publicējiet, lai piemērotu.']);
     }
 
     if ($method === 'POST' && $action === 'publish') {

@@ -661,3 +661,13 @@ button.media-card { padding: 0; color: var(--text); text-align: left; cursor: po
 .heatmap__cell[style*="--level"] { background: color-mix(in srgb, var(--yellow) calc(var(--level) * 100%), #1f2326); }
 .heatmap__summary { margin: 14px 0 0; color: var(--muted); font-size: 13px; }
 @media (max-width: 720px) { .heatmap { gap: 2px; grid-template-columns: 22px repeat(24, minmax(0, 1fr)); } .heatmap__cell { min-height: 9px; } .heatmap__hour { font-size: 8px; } }
+
+/* Papildu pakalpojumi */
+.service-toggles { display: grid; gap: 10px; }
+.service-toggle { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--line); background: var(--ink-soft); cursor: pointer; }
+.service-toggle input { width: 20px; height: 20px; accent-color: var(--yellow); flex: none; }
+.service-toggle strong { display: block; font-size: 14px; }
+.service-toggle small { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
+.service-toggle small a { color: var(--muted); }
+.service-toggle.is-hidden strong { color: var(--muted); text-decoration: line-through; }
+.page-row__hidden { display: inline-block; margin-left: 8px; padding: 1px 7px; border: 1px solid var(--line-strong); color: var(--muted); font-size: 10px; font-style: normal; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; vertical-align: middle; }

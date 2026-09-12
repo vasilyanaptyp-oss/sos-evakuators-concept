@@ -8,7 +8,17 @@ const CMS_PRIMARY_TEL = '+37122002700';
 const CMS_SECONDARY_PHONE = '+371 20091762';
 const CMS_SECONDARY_TEL = '+37120091762';
 const CMS_EMAIL = 'tktrans@inbox.lv';
-const CMS_ANALYTICS_VERSION = '20260910-private-insights';
+const CMS_ANALYTICS_VERSION = '20260912-bots';
+const CMS_PUBLISHED_MARK = '<!-- cms:published -->';
+// Prices as they are written in the built pages (the CMS rewrites every occurrence when they change).
+const CMS_PRICE_DEFAULTS = ['auto' => '30', 'auto_km' => '0.80', 'kravas' => '150', 'kravas_km' => '1.50'];
+// Additional services listed on «Citi pakalpojumi»: the admin can hide any of them without deleting pages.
+const CMS_EXTRA_SERVICES = [
+    'wells' => ['label' => 'Aku tīrīšana', 'pages' => ['lv' => 'aku-tirisana/index.html', 'ru' => 'ru/chistka-kolodtsev/index.html', 'en' => 'en/well-cleaning/index.html']],
+    'waste' => ['label' => 'Atkritumu izvešana', 'pages' => ['lv' => 'atkritumu-izvesana/index.html', 'ru' => 'ru/vyvoz-musora/index.html', 'en' => 'en/waste-removal/index.html']],
+    'fitness' => ['label' => 'EMS treniņi (EMS Fit Studio)', 'pages' => ['lv' => 'fitness/index.html', 'ru' => 'ru/fitnes/index.html', 'en' => 'en/fitness/index.html']],
+];
+const CMS_EXTRA_HUBS = ['lv' => 'citi-pakalpojumi/index.html', 'ru' => 'ru/drugie-uslugi/index.html', 'en' => 'en/other-services/index.html'];
 
 function cms_strlen(string $value): int
 {
@@ -196,6 +206,10 @@ function cms_sync_unedited_baseline(string $page): void
 
     $sourceHtml = @file_get_contents($source);
     $baselineHtml = @file_get_contents($baseline);
+    // A CMS-published file carries replaced phones, prices or hidden pages: only fresh deployments may refresh the baseline.
+    if (is_string($sourceHtml) && str_contains($sourceHtml, CMS_PUBLISHED_MARK)) {
+        return;
+    }
     if ($sourceHtml === false || $baselineHtml === false || hash_equals(hash('sha256', $sourceHtml), hash('sha256', $baselineHtml))) {
         return;
     }
@@ -220,6 +234,22 @@ function cms_read_baseline(string $page): string
         throw new RuntimeException('Neizdevās nolasīt lapu.');
     }
     return $html;
+}
+
+/**
+ * libxml serialises every non-ASCII character as an entity (&#1085;, &euro;, &nbsp;) which
+ * multiplies the size of Latvian and Russian pages. Decode those back to UTF-8 and keep the
+ * ASCII-significant ones (&lt; &gt; &amp; &quot; &#39;) exactly as they are.
+ */
+function cms_restore_utf8(string $html): string
+{
+    return (string) preg_replace_callback('/&(?:#\d{2,7}|#x[0-9a-fA-F]{2,6}|[A-Za-z][A-Za-z0-9]{1,31});/', static function (array $match): string {
+        $decoded = html_entity_decode($match[0], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        if ($decoded === $match[0] || $decoded === '' || (strlen($decoded) === 1 && ord($decoded) < 0x80)) {
+            return $match[0];
+        }
+        return $decoded;
+    }, $html);
 }
 
 function cms_dom_load(string $html): DOMDocument
@@ -288,11 +318,76 @@ function cms_replace_global_values(string $html, array $global): string
     $secondary = trim((string) ($global['secondary_phone'] ?? CMS_SECONDARY_PHONE));
     $secondaryTel = preg_replace('/[^+0-9]/', '', (string) ($global['secondary_tel'] ?? $secondary));
     $email = trim((string) ($global['email'] ?? CMS_EMAIL));
-    return str_replace(
+    $html = str_replace(
         [CMS_PRIMARY_PHONE, CMS_PRIMARY_TEL, '37122002700', CMS_SECONDARY_PHONE, CMS_SECONDARY_TEL, '37120091762', CMS_EMAIL],
         [$primary, $primaryTel, ltrim($primaryTel, '+'), $secondary, $secondaryTel, ltrim($secondaryTel, '+'), $email],
         $html
     );
+    return cms_replace_prices($html, cms_prices_get($global));
+}
+
+function cms_prices_get(array $global): array
+{
+    $prices = [];
+    foreach (CMS_PRICE_DEFAULTS as $key => $default) {
+        $value = (string) ($global['price_' . $key] ?? '');
+        $prices[$key] = preg_match('/^\d{1,5}(\.\d{1,2})?$/', $value) ? $value : $default;
+    }
+    return $prices;
+}
+
+function cms_price_display(string $value, string $lang): string
+{
+    if (strpos($value, '.') !== false) {
+        [$whole, $fraction] = explode('.', $value, 2);
+        $fraction = rtrim($fraction, '0');
+        $value = $fraction === '' ? $whole : $whole . '.' . str_pad($fraction, 2, '0');
+    }
+    return $lang === 'en' ? $value : str_replace('.', ',', $value);
+}
+
+function cms_replace_prices(string $html, array $prices): string
+{
+    $lang = preg_match('/<html[^>]*\blang="([a-z]{2})"/i', $html, $m) ? strtolower($m[1]) : 'lv';
+    $tokens = [];
+    $values = [];
+    $index = 0;
+    foreach (CMS_PRICE_DEFAULTS as $key => $default) {
+        $current = (string) ($prices[$key] ?? $default);
+        if ($current === $default) {
+            continue;
+        }
+        $defaultPattern = str_replace('\.', '[.,]', preg_quote($default, '/'));
+        $token = "\x00CMSPRICE" . $index++ . "\x00";
+        $tokens['/(?<![\d.,])' . $defaultPattern . ' €/u'] = $token;
+        $values[$token] = cms_price_display($current, $lang) . ' €';
+        if ($key === 'auto' || $key === 'kravas') {
+            $tokenMin = "\x00CMSPRICE" . $index++ . "\x00";
+            $tokens['/"minPrice":' . preg_quote($default, '/') . '(?![\d.])/'] = $tokenMin;
+            $values[$tokenMin] = '"minPrice":' . $current;
+        }
+    }
+    if (!$tokens) {
+        return $html;
+    }
+    $html = (string) preg_replace(array_keys($tokens), array_values($tokens), $html);
+    return str_replace(array_keys($values), array_values($values), $html);
+}
+
+function cms_save_prices_draft(array $payload): array
+{
+    $prices = [];
+    foreach (CMS_PRICE_DEFAULTS as $key => $default) {
+        $value = str_replace([',', ' '], ['.', ''], trim((string) ($payload['price_' . $key] ?? '')));
+        if (!preg_match('/^\d{1,5}(\.\d{1,2})?$/', $value)) {
+            throw new InvalidArgumentException('Cena jānorāda kā skaitlis, piemēram 30 vai 0,80.');
+        }
+        $prices['price_' . $key] = $value;
+    }
+    $state = cms_get_state('draft');
+    $state['global'] = array_merge((array) ($state['global'] ?? []), $prices);
+    cms_save_state('draft', $state);
+    return $state;
 }
 
 function cms_valid_asset_src(string $src): bool
@@ -427,7 +522,7 @@ function cms_append_fragment(DOMDocument $dom, DOMNode $target, string $html): v
 {
     $temporary = new DOMDocument('1.0', 'UTF-8');
     $previous = libxml_use_internal_errors(true);
-    $temporary->loadHTML('<!doctype html><html><body><div id="cms-fragment">' . $html . '</div></body></html>', LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NONET);
+    $temporary->loadHTML('<?xml encoding="UTF-8"><!doctype html><html><body><div id="cms-fragment">' . $html . '</div></body></html>', LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NONET);
     libxml_clear_errors();
     libxml_use_internal_errors($previous);
     $container = (new DOMXPath($temporary))->query('//*[@id="cms-fragment"]')->item(0);
@@ -518,9 +613,18 @@ function cms_render_page(string $page, array $state): string
     cms_apply_overrides($dom, $pageState);
     cms_sync_structured_data($dom, $state['global'] ?? []);
     cms_inject_blocks($dom, $pageState['blocks'] ?? []);
+    cms_apply_service_visibility($dom, $page, cms_hidden_services($state['global'] ?? []));
     $rendered = $dom->saveHTML();
-    $output = $rendered === false ? $html : $rendered;
-    return (string) preg_replace('/analytics\.js\?v=[A-Za-z0-9._-]+/', 'analytics.js?v=' . CMS_ANALYTICS_VERSION, $output);
+    $output = $rendered === false ? $html : cms_restore_utf8($rendered);
+    $output = (string) preg_replace('/analytics\.js\?v=[A-Za-z0-9._-]+/', 'analytics.js?v=' . CMS_ANALYTICS_VERSION, $output);
+    // Marker: a file with it was written by the CMS, so the baseline must never be re-synced from it.
+    if (!str_contains($output, CMS_PUBLISHED_MARK)) {
+        $output = (string) preg_replace('#\s*</html>\s*$#i', "
+" . CMS_PUBLISHED_MARK . "
+</html>
+", $output, 1);
+    }
+    return $output;
 }
 
 function cms_nearest_label(DOMNode $node): string
@@ -751,13 +855,13 @@ function cms_save_global_draft(array $payload): array
         throw new InvalidArgumentException('E-pasta adrese nav derīga.');
     }
     $state = cms_get_state('draft');
-    $state['global'] = [
+    $state['global'] = array_merge((array) ($state['global'] ?? []), [
         'primary_phone' => $primary,
         'primary_tel' => $primaryTel,
         'secondary_phone' => $secondary,
         'secondary_tel' => $secondaryTel,
         'email' => $email,
-    ];
+    ]);
     cms_save_state('draft', $state);
     return $state;
 }
@@ -828,6 +932,16 @@ function cms_publish(): array
             $primaryTel = preg_replace('/\D+/', '', (string) ($global['primary_tel'] ?? CMS_PRIMARY_TEL));
             $app = str_replace(['37122002700', '+371 22002700'], [$primaryTel, (string) ($global['primary_phone'] ?? CMS_PRIMARY_PHONE)], $appBaseline);
             cms_atomic_write(CMS_ROOT . DIRECTORY_SEPARATOR . 'app.js', $app);
+        }
+
+        $sitemapBaseline = cms_ensure_aux_baseline('sitemap.xml');
+        if ($sitemapBaseline !== '') {
+            $sitemap = $sitemapBaseline;
+            foreach (cms_hidden_pages($draft['global'] ?? []) as $hiddenPage) {
+                $url = preg_quote(cms_page_url($hiddenPage), '#');
+                $sitemap = (string) preg_replace('#\s*<url>\s*<loc>[^<]*' . $url . '</loc>.*?</url>#s', '', $sitemap);
+            }
+            cms_atomic_write(CMS_ROOT . DIRECTORY_SEPARATOR . 'sitemap.xml', $sitemap);
         }
 
         $draft['meta']['published_at'] = date(DATE_ATOM);
@@ -1529,4 +1643,121 @@ function cms_notify_save(array $payload): array
     }
     cms_write_json(CMS_STORAGE . DIRECTORY_SEPARATOR . 'notify.json', $next);
     return cms_notify_get();
+}
+
+/* ---------- Papildu pakalpojumi: show / hide ---------- */
+function cms_hidden_services(array $global): array
+{
+    $hidden = [];
+    foreach ((array) ($global['hidden_services'] ?? []) as $key) {
+        if (isset(CMS_EXTRA_SERVICES[(string) $key])) {
+            $hidden[] = (string) $key;
+        }
+    }
+    return array_values(array_unique($hidden));
+}
+
+function cms_hidden_pages(array $global): array
+{
+    $pages = [];
+    foreach (cms_hidden_services($global) as $key) {
+        foreach (CMS_EXTRA_SERVICES[$key]['pages'] as $page) {
+            $pages[] = $page;
+        }
+    }
+    return $pages;
+}
+
+function cms_services_get(array $global): array
+{
+    $hidden = cms_hidden_services($global);
+    $result = [];
+    foreach (CMS_EXTRA_SERVICES as $key => $service) {
+        $result[] = [
+            'key' => $key,
+            'label' => $service['label'],
+            'visible' => !in_array($key, $hidden, true),
+            'url' => cms_page_url($service['pages']['lv']),
+            'pages' => array_values($service['pages']),
+        ];
+    }
+    return $result;
+}
+
+function cms_save_services_draft(array $payload): array
+{
+    $hidden = [];
+    foreach ((array) ($payload['hidden'] ?? []) as $key) {
+        if (!isset(CMS_EXTRA_SERVICES[(string) $key])) {
+            throw new InvalidArgumentException('Nezināms pakalpojums.');
+        }
+        $hidden[] = (string) $key;
+    }
+    $state = cms_get_state('draft');
+    $state['global'] = array_merge((array) ($state['global'] ?? []), ['hidden_services' => array_values(array_unique($hidden))]);
+    cms_save_state('draft', $state);
+    return $state;
+}
+
+function cms_apply_service_visibility(DOMDocument $dom, string $page, array $hidden): void
+{
+    if (!$hidden) {
+        return;
+    }
+    $xpath = new DOMXPath($dom);
+    $lang = array_search($page, CMS_EXTRA_HUBS, true);
+    if ($lang !== false) {
+        // Hub page: drop the cards of hidden services, renumber the rest and fix the counter.
+        $directories = [];
+        foreach ($hidden as $key) {
+            $directories[] = basename(dirname(CMS_EXTRA_SERVICES[$key]['pages'][$lang]));
+        }
+        foreach ($xpath->query('//a[contains(concat(" ", normalize-space(@class), " "), " directory-item ")]') as $node) {
+            if (!$node instanceof DOMElement) {
+                continue;
+            }
+            $href = rtrim($node->getAttribute('href'), '/');
+            if (in_array(basename($href), $directories, true)) {
+                $node->parentNode->removeChild($node);
+            }
+        }
+        $count = 0;
+        foreach ($xpath->query('//span[contains(concat(" ", normalize-space(@class), " "), " directory-item__number ")]') as $node) {
+            $node->nodeValue = str_pad((string) (++$count), 2, '0', STR_PAD_LEFT);
+        }
+        $words = ['lv' => ['virziens', 'virzieni'], 'ru' => ['направление', 'направления'], 'en' => ['direction', 'directions']];
+        $counter = $xpath->query('//p[contains(concat(" ", normalize-space(@class), " "), " hero-note ")]/strong')->item(0);
+        if ($counter && preg_match('/^\d+\s/u', trim((string) $counter->textContent))) {
+            $counter->nodeValue = $count . ' ' . $words[$lang][$count === 1 ? 0 : 1];
+        }
+        return;
+    }
+    foreach ($hidden as $key) {
+        $lang = array_search($page, CMS_EXTRA_SERVICES[$key]['pages'], true);
+        if ($lang === false) {
+            continue;
+        }
+        // Hidden service page: keep the file, but hide it from search engines and send visitors to the list.
+        $head = $xpath->query('//head')->item(0);
+        if (!$head) {
+            return;
+        }
+        $robots = $xpath->query('//meta[translate(@name,"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz")="robots"]')->item(0);
+        if ($robots instanceof DOMElement) {
+            $robots->setAttribute('content', 'noindex, nofollow');
+        } else {
+            $robots = $dom->createElement('meta');
+            $robots->setAttribute('name', 'robots');
+            $robots->setAttribute('content', 'noindex, nofollow');
+            $head->appendChild($robots);
+        }
+        $refresh = $dom->createElement('meta');
+        $refresh->setAttribute('http-equiv', 'refresh');
+        $refresh->setAttribute('content', '0; url=' . cms_page_url(CMS_EXTRA_HUBS[$lang]));
+        $head->appendChild($refresh);
+        foreach ($xpath->query('//link[@rel="canonical"]') as $canonical) {
+            $canonical->parentNode->removeChild($canonical);
+        }
+        return;
+    }
 }
