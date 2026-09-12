@@ -46,6 +46,29 @@
   window.dataLayer = window.dataLayer || [];
   let gtagLoaded = false;
 
+  // First-party counters are skipped for automation, crawlers, the admin area and
+  // anyone who opened the site once with ?notrack=1 (the owner, the developer).
+  const BOT_UA = /bot|crawl|spider|slurp|headless|playwright|puppeteer|lighthouse|pagespeed|gtmetrix|pingdom|uptime|monitor|curl\/|wget|python|httpclient|phantom|selenium|facebookexternalhit|preview/i;
+  let firstPartyMuted = false;
+  try {
+    const params = new URLSearchParams(location.search);
+    if (params.has("notrack")) localStorage.setItem("ap_notrack", params.get("notrack") === "0" ? "" : "1");
+    firstPartyMuted = localStorage.getItem("ap_notrack") === "1";
+  } catch (_) {}
+  if (navigator.webdriver === true || BOT_UA.test(navigator.userAgent || "") || /^\/(admin|adm)(\/|$)/.test(location.pathname)) firstPartyMuted = true;
+
+  // Daily visitor id (rolls over at midnight) — a person is one visitor per day, not one per tab.
+  let firstPartyVisitor = "";
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const stored = JSON.parse(localStorage.getItem("ap_visitor") || "null");
+    if (stored && stored.d === today && /^[a-f0-9-]{16,64}$/.test(stored.id)) firstPartyVisitor = stored.id;
+    else {
+      firstPartyVisitor = globalThis.crypto?.randomUUID?.() || `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}-${Math.random().toString(16).slice(2)}`;
+      localStorage.setItem("ap_visitor", JSON.stringify({ id: firstPartyVisitor, d: today }));
+    }
+  } catch (_) {}
+
   let firstPartySession = "";
   try {
     firstPartySession = sessionStorage.getItem("ap_session") || "";
@@ -77,10 +100,11 @@
 
   const sendFirstParty = (event) => {
     const allowed = ["page_view", "heartbeat", "phone_primary", "phone_secondary", "whatsapp_open", "location_open", "request_prepared", "sms_open"];
-    if (!allowed.includes(event)) return;
+    if (!allowed.includes(event) || firstPartyMuted) return;
     const payload = JSON.stringify({
       event,
       session: firstPartySession,
+      visitor: firstPartyVisitor || firstPartySession,
       path: location.pathname,
       language: document.documentElement.lang || "lv",
       device: firstPartyDevice,

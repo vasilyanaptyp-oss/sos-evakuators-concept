@@ -28,8 +28,19 @@ if (!is_array($input)) {
     exit;
 }
 
+// Crawlers, headless browsers and command-line clients are not customers.
+$agent = (string) ($_SERVER['HTTP_USER_AGENT'] ?? '');
+if ($agent === '' || preg_match('/bot|crawl|spider|slurp|headless|playwright|puppeteer|lighthouse|pagespeed|gtmetrix|pingdom|uptime|monitor|curl\/|wget|python|httpclient|phantom|selenium|facebookexternalhit|preview/i', $agent)) {
+    http_response_code(204);
+    exit;
+}
+
 $event = strtolower(trim((string) ($input['event'] ?? '')));
 $sessionId = strtolower(trim((string) ($input['session'] ?? '')));
+$visitorId = strtolower(trim((string) ($input['visitor'] ?? '')));
+if (!preg_match('/^[a-f0-9-]{16,64}$/', $visitorId)) {
+    $visitorId = $sessionId;
+}
 $allowedEvents = [
     'page_view',
     'heartbeat',
@@ -50,6 +61,11 @@ $path = trim((string) ($input['path'] ?? '/'));
 $path = preg_replace('/[?#].*$/', '', $path);
 $path = '/' . ltrim((string) preg_replace('#[^A-Za-z0-9_./-]#', '', $path), '/');
 $path = substr($path, 0, 140);
+// Only real pages count: the admin area, previews and 404s (e.g. /adm/) are ignored.
+if (preg_match('#^/(admin|adm)(/|$)#', $path) || ($path !== '/' && !is_file(__DIR__ . rtrim($path, '/') . '/index.html'))) {
+    http_response_code(204);
+    exit;
+}
 $language = strtolower((string) ($input['language'] ?? 'lv'));
 $language = in_array($language, ['lv', 'ru', 'en'], true) ? $language : 'lv';
 $device = strtolower((string) ($input['device'] ?? 'desktop'));
@@ -129,6 +145,7 @@ try {
     $now = time();
     $date = date('Y-m-d', $now);
     $sessionKey = hash('sha256', $sessionId);
+    $visitorKey = hash('sha256', $visitorId);
     $activePath = $directory . DIRECTORY_SEPARATOR . 'active.json';
     $active = analytics_read_json($activePath);
     foreach ($active as $key => $row) {
@@ -173,8 +190,8 @@ try {
             ];
         }
         $daily['totals'][$event] = min(1000000, (int) ($daily['totals'][$event] ?? 0) + 1);
-        if (!isset($daily['visitors'][$sessionKey]) && count((array) $daily['visitors']) < 10000) {
-            $daily['visitors'][$sessionKey] = 1;
+        if (!isset($daily['visitors'][$visitorKey]) && count((array) $daily['visitors']) < 10000) {
+            $daily['visitors'][$visitorKey] = 1;
         }
         if (!isset($daily['pages'][$path]) && count((array) $daily['pages']) < 300) {
             $daily['pages'][$path] = [];

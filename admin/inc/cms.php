@@ -1343,7 +1343,7 @@ function cms_site_audit(bool $force = false): array
         if ($h1Count !== 1) {
             cms_audit_issue($issues, 'error', $page, 'H1 struktūra', 'Atrasti H1: ' . $h1Count . '; lapā jābūt vienam galvenajam virsrakstam.');
         }
-        if ($xpath->query('//link[translate(@rel,"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz")="canonical"]')->length < 1) {
+        if ($page !== '404.html' && $xpath->query('//link[translate(@rel,"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz")="canonical"]')->length < 1) {
             cms_audit_issue($issues, 'error', $page, 'Nav canonical saites', 'Norādiet lapas galveno URL versiju.');
         }
         $hreflangCount = $xpath->query('//link[@hreflang]')->length;
