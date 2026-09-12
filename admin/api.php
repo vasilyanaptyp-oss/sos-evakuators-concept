@@ -122,7 +122,12 @@ try {
         }
         $media = cms_upload_image($_FILES['image']);
         cms_activity_log('upload_image', ['file' => $media['name'] ?? '']);
-        cms_json_response(['ok' => true, 'media' => $media, 'message' => 'Attēls pievienots bibliotēkai.']);
+        $format = static fn (int $bytes): string => $bytes >= 1024 * 1024 ? number_format($bytes / 1024 / 1024, 1, ',', '') . ' MB' : (string) max(1, (int) round($bytes / 1024)) . ' KB';
+        $message = 'Attēls pievienots bibliotēkai.';
+        if (($media['mode'] ?? 'original') !== 'original' && ($media['saved_percent'] ?? 0) > 0) {
+            $message = 'Attēls pievienots: ' . $format((int) $media['original_bytes']) . ' → ' . $format((int) $media['bytes']) . ' (−' . $media['saved_percent'] . ' %' . (($media['mode'] ?? '') === 'webp' ? ', WebP' : '') . ').';
+        }
+        cms_json_response(['ok' => true, 'media' => $media, 'message' => $message]);
     }
 
     if ($method === 'POST' && $action === 'delete-media') {

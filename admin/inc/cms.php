@@ -1048,6 +1048,27 @@ function cms_media_list(): array
     return array_slice($media, 0, 500);
 }
 
+function cms_image_orient($image, string $path)
+{
+    // Phone photos carry the rotation in EXIF only; bake it into the pixels so browsers show it upright.
+    if (!function_exists('exif_read_data')) {
+        return $image;
+    }
+    $exif = @exif_read_data($path);
+    $orientation = is_array($exif) ? (int) ($exif['Orientation'] ?? 1) : 1;
+    switch ($orientation) {
+        case 3: $rotated = imagerotate($image, 180, 0); break;
+        case 6: $rotated = imagerotate($image, -90, 0); break;
+        case 8: $rotated = imagerotate($image, 90, 0); break;
+        default: return $image;
+    }
+    if ($rotated === false) {
+        return $image;
+    }
+    imagedestroy($image);
+    return $rotated;
+}
+
 function cms_upload_image(array $file): array
 {
     if (!isset($file['error']) || (int) $file['error'] !== UPLOAD_ERR_OK) {
@@ -1064,6 +1085,7 @@ function cms_upload_image(array $file): array
     if ((int) $info[0] < 240 || (int) $info[1] < 180) {
         throw new InvalidArgumentException('Attēls ir pārāk mazs.');
     }
+    $originalBytes = (int) @filesize($temporary);
 
     $base = pathinfo((string) ($file['name'] ?? 'attels'), PATHINFO_FILENAME);
     $base = preg_replace('/[^A-Za-z0-9_-]+/', '-', $base);
@@ -1074,23 +1096,51 @@ function cms_upload_image(array $file): array
     $base = substr($base, 0, 60) . '-' . date('Ymd-His') . '-' . substr(bin2hex(random_bytes(3)), 0, 6);
     $saved = false;
     $filename = '';
+    $mode = 'original';
 
-    if (function_exists('imagecreatefromstring') && function_exists('imagewebp')) {
+    if (function_exists('imagecreatefromstring')) {
         $raw = @file_get_contents($temporary);
         $image = $raw !== false ? @imagecreatefromstring($raw) : false;
         if ($image !== false) {
+            if ((int) $info[2] === IMAGETYPE_JPEG) {
+                $image = cms_image_orient($image, $temporary);
+            }
+            $hasAlpha = (int) $info[2] !== IMAGETYPE_JPEG;
+            if ($hasAlpha) {
+                imagepalettetotruecolor($image);
+                imagealphablending($image, false);
+                imagesavealpha($image, true);
+            }
             $width = imagesx($image);
             $height = imagesy($image);
-            if (max($width, $height) > 2000) {
-                $scale = 2000 / max($width, $height);
+            $limit = 1600; // wider than any layout slot on the site; keeps phone photos from weighing megabytes
+            if (max($width, $height) > $limit) {
+                $scale = $limit / max($width, $height);
                 $resized = imagescale($image, max(1, (int) round($width * $scale)), max(1, (int) round($height * $scale)), IMG_BICUBIC);
                 if ($resized !== false) {
+                    if ($hasAlpha) {
+                        imagealphablending($resized, false);
+                        imagesavealpha($resized, true);
+                    }
                     imagedestroy($image);
                     $image = $resized;
                 }
             }
-            $filename = $base . '.webp';
-            $saved = imagewebp($image, CMS_UPLOADS . DIRECTORY_SEPARATOR . $filename, 84);
+            if (function_exists('imagewebp')) {
+                $filename = $base . '.webp';
+                $saved = @imagewebp($image, CMS_UPLOADS . DIRECTORY_SEPARATOR . $filename, 82);
+                $mode = 'webp';
+            }
+            if (!$saved && !$hasAlpha && function_exists('imagejpeg')) {
+                $filename = $base . '.jpg';
+                $saved = @imagejpeg($image, CMS_UPLOADS . DIRECTORY_SEPARATOR . $filename, 82);
+                $mode = 'jpeg';
+            }
+            if (!$saved && $hasAlpha && function_exists('imagepng')) {
+                $filename = $base . '.png';
+                $saved = @imagepng($image, CMS_UPLOADS . DIRECTORY_SEPARATOR . $filename, 8);
+                $mode = 'png';
+            }
             imagedestroy($image);
         }
     }
@@ -1098,19 +1148,41 @@ function cms_upload_image(array $file): array
     if (!$saved) {
         $extension = [(int) IMAGETYPE_JPEG => 'jpg', (int) IMAGETYPE_PNG => 'png', (int) IMAGETYPE_WEBP => 'webp'][(int) $info[2]];
         $filename = $base . '.' . $extension;
-        $saved = @move_uploaded_file($temporary, CMS_UPLOADS . DIRECTORY_SEPARATOR . $filename);
+        $saved = @move_uploaded_file($temporary, CMS_UPLOADS . DIRECTORY_SEPARATOR . $filename)
+            || @rename($temporary, CMS_UPLOADS . DIRECTORY_SEPARATOR . $filename);
+        $mode = 'original';
     }
     if (!$saved) {
         throw new RuntimeException('Serveris nevarēja saglabāt attēlu.');
     }
-    @chmod(CMS_UPLOADS . DIRECTORY_SEPARATOR . $filename, 0644);
-    $size = @getimagesize(CMS_UPLOADS . DIRECTORY_SEPARATOR . $filename);
+    $target = CMS_UPLOADS . DIRECTORY_SEPARATOR . $filename;
+    @chmod($target, 0644);
+    $bytes = (int) @filesize($target);
+    // A converted file that came out larger than the original is not an optimisation: keep the original.
+    if ($mode !== 'original' && $originalBytes > 0 && $bytes > $originalBytes && is_file($temporary)) {
+        $extension = [(int) IMAGETYPE_JPEG => 'jpg', (int) IMAGETYPE_PNG => 'png', (int) IMAGETYPE_WEBP => 'webp'][(int) $info[2]];
+        $original = $base . '.' . $extension;
+        if (@copy($temporary, CMS_UPLOADS . DIRECTORY_SEPARATOR . $original)) {
+            if ($original !== $filename) {
+                @unlink($target);
+            }
+            $filename = $original;
+            $target = CMS_UPLOADS . DIRECTORY_SEPARATOR . $filename;
+            @chmod($target, 0644);
+            $bytes = (int) @filesize($target);
+            $mode = 'original';
+        }
+    }
+    $size = @getimagesize($target);
     return [
         'name' => $filename,
         'url' => '/assets/uploads/' . rawurlencode($filename),
         'src' => '/assets/uploads/' . $filename,
         'source' => 'uploads',
-        'bytes' => filesize(CMS_UPLOADS . DIRECTORY_SEPARATOR . $filename),
+        'bytes' => $bytes,
+        'original_bytes' => $originalBytes,
+        'saved_percent' => $originalBytes > 0 ? max(0, (int) round(100 - ($bytes / $originalBytes) * 100)) : 0,
+        'mode' => $mode,
         'width' => is_array($size) ? $size[0] : null,
         'height' => is_array($size) ? $size[1] : null,
     ];
