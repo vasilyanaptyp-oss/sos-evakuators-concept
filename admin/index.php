@@ -99,6 +99,7 @@ cms_touch_session();
       <nav class="side-nav" aria-label="Vadības sadaļas">
         <button type="button" class="is-active" data-view="dashboard"><span class="nav-icon">⌂</span><span>Pārskats</span></button>
         <button type="button" data-view="analytics"><span class="nav-icon">↗</span><span>Statistika</span></button>
+        <button type="button" data-view="leads"><span class="nav-icon">☏</span><span>Pieteikumi</span><b data-leads-count hidden>0</b></button>
         <button type="button" data-view="pages"><span class="nav-icon">▤</span><span>Lapas</span><b data-page-count>—</b></button>
         <button type="button" data-view="media"><span class="nav-icon">◇</span><span>Attēli</span></button>
         <button type="button" data-view="optimization"><span class="nav-icon">✓</span><span>Optimizācija</span></button>

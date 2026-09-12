@@ -7,7 +7,7 @@ const PRODUCTION = process.argv.includes("--production");
 const BASE = PRODUCTION
   ? "https://autopalidziba.lv"
   : "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
-const VERSION = "20260912-wells";
+const VERSION = "20260912-leads";
 const LANGS = ["lv", "ru", "en"];
 const ROUTES = {
   hub: { lv: ["citi-pakalpojumi"], ru: ["ru", "drugie-uslugi"], en: ["en", "other-services"] },

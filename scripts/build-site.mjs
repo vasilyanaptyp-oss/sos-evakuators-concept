@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { LANGS, LANG_META, SERVICES, T, BUSINESS, SERVICE_OG } from "./site-content.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const ASSETS_V = "20260912-bots";
+const ASSETS_V = "20260912-leads";
 const ANALYTICS_V = "20260912-bots";
 const CONCEPT_BASE = "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
 const PRODUCTION_BASE = "https://autopalidziba.lv";
@@ -595,8 +595,9 @@ ${issueOptions}
           </label>
           <small id="photo-hint">${esc(form.photoHint)}</small>
         </div>
+        <label class="hp" aria-hidden="true"><input type="text" name="company" tabindex="-1" autocomplete="off"></label>
         <button type="submit" class="form-submit magnetic">${esc(form.submit)} <span aria-hidden="true">↗</span></button>
-        <p class="form-note">${esc(form.note)}</p>
+        <p class="form-note">${esc(form.note)} ${esc(form.privacy)}</p>
         <p class="form-status" aria-live="polite"></p>
       </form>
     </section>

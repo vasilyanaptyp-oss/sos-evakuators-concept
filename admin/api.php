@@ -27,6 +27,8 @@ try {
             'analytics' => cms_analytics_summary(30),
             'backups' => $backups,
             'activity' => cms_activity_list(12),
+            'leads_new' => cms_leads_count_new(),
+            'notify' => cms_notify_get(),
             'stats' => [
                 'pages' => count($pages),
                 'languages' => count(array_unique(array_column($pages, 'lang'))),
@@ -38,6 +40,10 @@ try {
 
     if ($method === 'GET' && $action === 'analytics') {
         cms_json_response(['ok' => true, 'analytics' => cms_analytics_summary(30)]);
+    }
+
+    if ($method === 'GET' && $action === 'leads') {
+        cms_json_response(['ok' => true, 'leads' => cms_leads_list(), 'leads_new' => cms_leads_count_new()]);
     }
 
     if ($method === 'GET' && $action === 'audit') {
@@ -115,6 +121,27 @@ try {
         cms_change_password((string) ($input['current'] ?? ''), (string) ($input['next'] ?? ''));
         cms_activity_log('change_password');
         cms_json_response(['ok' => true, 'message' => 'Parole nomainīta.']);
+    }
+
+    if ($method === 'POST' && $action === 'lead-status') {
+        $input = cms_json_input();
+        $lead = cms_lead_set_status((string) ($input['id'] ?? ''), (string) ($input['status'] ?? 'done'));
+        cms_activity_log('lead_status', ['revision' => $lead['id'] . ' ' . $lead['status']]);
+        cms_json_response(['ok' => true, 'lead' => $lead, 'leads_new' => cms_leads_count_new(), 'message' => $lead['status'] === 'done' ? 'Pieteikums atzīmēts kā apstrādāts.' : 'Pieteikums atkal ir jauns.']);
+    }
+
+    if ($method === 'POST' && $action === 'lead-delete') {
+        $input = cms_json_input();
+        cms_lead_delete((string) ($input['id'] ?? ''));
+        cms_activity_log('lead_delete', ['revision' => (string) ($input['id'] ?? '')]);
+        cms_json_response(['ok' => true, 'leads_new' => cms_leads_count_new(), 'message' => 'Pieteikums dzēsts.']);
+    }
+
+    if ($method === 'POST' && $action === 'save-notify') {
+        $input = cms_json_input();
+        $notify = cms_notify_save($input);
+        cms_activity_log('save_notify');
+        cms_json_response(['ok' => true, 'notify' => $notify, 'message' => 'Paziņojumu iestatījumi saglabāti.']);
     }
 
     if ($method === 'POST' && $action === 'logout') {

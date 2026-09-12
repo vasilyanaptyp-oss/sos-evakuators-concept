@@ -170,7 +170,8 @@ export const T = {
           photoNone: "Foto nav izvēlēts",
           photoHint: "Līdz 4 attēliem un kopā līdz 20 MB. Tālrunī izvēlieties WhatsApp kopīgošanas izvēlnē.",
           submit: "Sagatavot pieprasījumu",
-          note: "Ar foto atvērsies tālruņa kopīgošanas izvēlne — izvēlieties WhatsApp. Bez foto atvērsies WhatsApp ar sagatavotu ziņu. Steidzamākā situācijā zvaniet."
+          note: "Ar foto atvērsies tālruņa kopīgošanas izvēlne — izvēlieties WhatsApp. Bez foto atvērsies WhatsApp ar sagatavotu ziņu. Steidzamākā situācijā zvaniet.",
+          privacy: "Vārds, tālrunis un apraksts nonāk tikai pie dispečera un netiek nodoti trešajām personām."
         }
       }
     },
@@ -585,7 +586,8 @@ export const T = {
           photoNone: "Фото не выбрано",
           photoHint: "До 4 изображений, суммарно до 20 МБ. На телефоне выберите WhatsApp в меню общего доступа.",
           submit: "Подготовить запрос",
-          note: "С фото откроется меню общего доступа телефона — выберите WhatsApp. Без фото откроется WhatsApp с подготовленным сообщением. В срочной ситуации звоните."
+          note: "С фото откроется меню общего доступа телефона — выберите WhatsApp. Без фото откроется WhatsApp с подготовленным сообщением. В срочной ситуации звоните.",
+          privacy: "Имя, телефон и описание попадают только диспетчеру и не передаются третьим лицам."
         }
       }
     },
@@ -1000,7 +1002,8 @@ export const T = {
           photoNone: "No photo selected",
           photoHint: "Up to 4 images, 20 MB in total. On your phone, choose WhatsApp in the share sheet.",
           submit: "Prepare the request",
-          note: "With photos, the phone's share sheet opens — choose WhatsApp. Without photos, WhatsApp opens with a prepared message. In an urgent situation, call."
+          note: "With photos, the phone's share sheet opens — choose WhatsApp. Without photos, WhatsApp opens with a prepared message. In an urgent situation, call.",
+          privacy: "Your name, phone and description go only to the dispatcher and are never shared with third parties."
         }
       }
     },

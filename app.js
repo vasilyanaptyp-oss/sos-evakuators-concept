@@ -422,6 +422,16 @@
 
       track("request_prepared", { has_photos: photos.length > 0 });
 
+      // Server copy of the request (no photos), so the dispatcher gets it even if WhatsApp is closed.
+      try {
+        const lead = JSON.stringify({
+          name: data.get("name"), phone: data.get("phone"), issue: data.get("issue"), details: data.get("details") || "",
+          company: data.get("company") || "", page: location.pathname, language: document.documentElement.lang || "lv"
+        });
+        const saved = fetch("/request.php", { method: "POST", headers: { "Content-Type": "application/json" }, body: lead, keepalive: true, credentials: "omit" });
+        await Promise.race([saved, new Promise((resolve) => setTimeout(resolve, 2500))]);
+      } catch (_) {}
+
       if (photos.length) {
         let canSharePhotos = false;
         try {

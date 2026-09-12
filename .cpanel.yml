@@ -35,4 +35,5 @@ deployment:
     - /bin/cp sitemap.xml $DEPLOYPATH
     - /bin/cp styles.css $DEPLOYPATH
     - /bin/cp track.php $DEPLOYPATH
+    - /bin/cp request.php $DEPLOYPATH
     - /bin/cp -R treileris $DEPLOYPATH

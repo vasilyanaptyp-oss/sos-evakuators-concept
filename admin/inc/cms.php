@@ -1411,3 +1411,107 @@ function cms_site_audit(bool $force = false): array
     cms_write_json($cache, $result);
     return $result;
 }
+
+/* ---------- Pieteikumi (leads stored by request.php) ---------- */
+function cms_leads_dir(): string
+{
+    return CMS_STORAGE . DIRECTORY_SEPARATOR . 'leads';
+}
+
+function cms_lead_path(string $id): string
+{
+    if (!preg_match('/^\d{8}-\d{6}-[a-f0-9]{6}$/', $id)) {
+        throw new InvalidArgumentException('Nederīgs pieteikuma ID.');
+    }
+    return cms_leads_dir() . DIRECTORY_SEPARATOR . $id . '.json';
+}
+
+function cms_leads_list(int $limit = 300): array
+{
+    $files = glob(cms_leads_dir() . DIRECTORY_SEPARATOR . '*.json') ?: [];
+    rsort($files, SORT_STRING);
+    $leads = [];
+    foreach (array_slice($files, 0, max(1, min($limit, 1000))) as $file) {
+        $lead = cms_read_json($file);
+        if ($lead && isset($lead['id'])) {
+            $leads[] = $lead;
+        }
+    }
+    return $leads;
+}
+
+function cms_leads_count_new(): int
+{
+    $count = 0;
+    foreach (cms_leads_list(1000) as $lead) {
+        if (($lead['status'] ?? 'new') === 'new') {
+            $count++;
+        }
+    }
+    return $count;
+}
+
+function cms_lead_set_status(string $id, string $status): array
+{
+    if (!in_array($status, ['new', 'done'], true)) {
+        throw new InvalidArgumentException('Nederīgs statuss.');
+    }
+    $path = cms_lead_path($id);
+    $lead = cms_read_json($path);
+    if (!$lead) {
+        throw new InvalidArgumentException('Pieteikums nav atrasts.');
+    }
+    $lead['status'] = $status;
+    $lead['handled_at'] = $status === 'done' ? date(DATE_ATOM) : null;
+    $lead['handled_by'] = $status === 'done' ? cms_current_user() : null;
+    cms_write_json($path, $lead);
+    return $lead;
+}
+
+function cms_lead_delete(string $id): void
+{
+    $path = cms_lead_path($id);
+    if (is_file($path) && !@unlink($path)) {
+        throw new RuntimeException('Neizdevās dzēst pieteikumu.');
+    }
+}
+
+function cms_notify_get(): array
+{
+    $defaults = ['email' => '', 'email_enabled' => true, 'telegram_token' => '', 'telegram_chat' => ''];
+    $stored = cms_read_json(CMS_STORAGE . DIRECTORY_SEPARATOR . 'notify.json');
+    $merged = array_merge($defaults, array_intersect_key($stored, $defaults));
+    $merged['telegram_token_set'] = $merged['telegram_token'] !== '';
+    $merged['telegram_token'] = '';   // the token never leaves the server
+    return $merged;
+}
+
+function cms_notify_save(array $payload): array
+{
+    $current = cms_read_json(CMS_STORAGE . DIRECTORY_SEPARATOR . 'notify.json');
+    $email = trim((string) ($payload['email'] ?? ''));
+    if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        throw new InvalidArgumentException('Nederīga e-pasta adrese.');
+    }
+    $token = trim((string) ($payload['telegram_token'] ?? ''));
+    if ($token !== '' && !preg_match('/^\d+:[A-Za-z0-9_-]{20,}$/', $token)) {
+        throw new InvalidArgumentException('Telegram bota tokens izskatās nepareizi (formāts 123456:ABC…).');
+    }
+    $chat = trim((string) ($payload['telegram_chat'] ?? ''));
+    if ($chat !== '' && !preg_match('/^-?\d{1,20}$/', $chat)) {
+        throw new InvalidArgumentException('Telegram chat ID sastāv tikai no cipariem.');
+    }
+    $next = [
+        'email' => $email,
+        'email_enabled' => !empty($payload['email_enabled']),
+        'telegram_token' => $token !== '' ? $token : (string) ($current['telegram_token'] ?? ''),
+        'telegram_chat' => $chat,
+        'updated_at' => date(DATE_ATOM),
+    ];
+    if (!empty($payload['telegram_clear'])) {
+        $next['telegram_token'] = '';
+        $next['telegram_chat'] = '';
+    }
+    cms_write_json(CMS_STORAGE . DIRECTORY_SEPARATOR . 'notify.json', $next);
+    return cms_notify_get();
+}

@@ -57,6 +57,9 @@
     const labels = {
       save_page: "Saglabāja lapas melnrakstu",
       save_contacts: "Mainīja kontaktus melnrakstā",
+      lead_status: "Mainīja pieteikuma statusu",
+      lead_delete: "Dzēsa pieteikumu",
+      save_notify: "Mainīja paziņojumu iestatījumus",
       publish: "Publicēja vietni",
       discard_draft: "Atcēla melnraksta izmaiņas",
       restore_revision: "Atjaunoja iepriekšējo versiju",
@@ -167,7 +170,7 @@
     state.view = view;
     state.page = null;
     document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("is-active", button.dataset.view === view));
-    const titles = { dashboard: "Pārskats", analytics: "Statistika", pages: "Lapas", media: "Attēli", optimization: "Optimizācija", settings: "Kontakti", history: "Versijas" };
+    const titles = { dashboard: "Pārskats", analytics: "Statistika", leads: "Pieteikumi", pages: "Lapas", media: "Attēli", optimization: "Optimizācija", settings: "Kontakti", history: "Versijas" };
     viewTitle.textContent = titles[view] || "Vadība";
     previewButton.disabled = true;
     setSidebarOpen(false);
@@ -186,6 +189,7 @@
     workspace.innerHTML = `<div class="workspace-inner">
       ${renderIntro("Vadības centrs", "Viss svarīgais vienuviet.", "Redziet apmeklējumu un darbību kopsavilkumu, pārvaldiet saturu un pārbaudiet vietnes tehnisko stāvokli.")}
       <section class="stats-grid" aria-label="Vietnes statistika">
+        <article class="stat-card${state.data.leads_new ? " stat-card--alert" : ""}"><p>Jauni pieteikumi</p><strong>${formatNumber(state.data.leads_new)}</strong><small><button type="button" class="link-button" data-go="leads">atvērt pieteikumus →</button></small></article>
         <article class="stat-card stat-card--live"><p>Vietnē šobrīd</p><strong>${formatNumber(analytics.online_now)}</strong><small>aktīvi pēdējās 5 minūtēs</small></article>
         <article class="stat-card"><p>Apmeklētāji · 30 d.</p><strong>${formatNumber(analytics.unique_visitors)}</strong><small>anonīmas pārlūka sesijas</small></article>
         <article class="stat-card"><p>Tālruņa klikšķi · 30 d.</p><strong>${formatNumber(analytics.phone_clicks)}</strong><small>nevis savienoti zvani</small></article>
@@ -678,6 +682,19 @@
         </form>
       </section>
       <section class="panel form-panel" style="margin-top:18px">
+        <div class="panel__head"><h3>Paziņojumi par pieteikumiem</h3><span class="kicker">PIETEIKUMI</span></div>
+        <form class="panel__body" data-notify-form autocomplete="off">
+          <p class="settings-note">Katrs pieteikums no vietnes formas tiek saglabāts sadaļā «Pieteikumi» un uzreiz nosūtīts šeit norādītajiem kanāliem. Telegram: izveidojiet botu caur @BotFather, ielīmējiet tokenu, uzrakstiet botam jebko un ielīmējiet savu chat ID (to parāda @userinfobot).</p>
+          <div class="settings-grid">
+            <label class="field"><span>E-pasts paziņojumiem</span><input name="email" type="email" value="${escapeHtml(state.data.notify?.email || "")}" placeholder="${escapeHtml(global.email)}"></label>
+            <label class="field field--check"><input name="email_enabled" type="checkbox" ${state.data.notify?.email_enabled === false ? "" : "checked"}><span>Sūtīt e-pastu</span></label>
+            <label class="field"><span>Telegram bota tokens ${state.data.notify?.telegram_token_set ? "· saglabāts" : ""}</span><input name="telegram_token" type="password" autocomplete="off" placeholder="${state.data.notify?.telegram_token_set ? "••••••••  (atstājiet tukšu, lai nemainītu)" : "123456789:ABC…"}"></label>
+            <label class="field"><span>Telegram chat ID</span><input name="telegram_chat" inputmode="numeric" value="${escapeHtml(state.data.notify?.telegram_chat || "")}" placeholder="123456789"></label>
+          </div>
+          <div class="form-actions"><button class="button button--primary" type="submit">Saglabāt paziņojumus</button>${state.data.notify?.telegram_token_set ? `<button class="button button--ghost" type="button" data-notify-clear>Atslēgt Telegram</button>` : ""}</div>
+        </form>
+      </section>
+      <section class="panel form-panel" style="margin-top:18px">
         <div class="panel__head"><h3>Administratora parole</h3><span class="kicker">DROŠĪBA</span></div>
         <form class="panel__body" data-password-form autocomplete="off">
           <div class="settings-grid"><label class="field"><span>Pašreizējā parole</span><input name="current" type="password" autocomplete="current-password" required></label><label class="field"><span>Jaunā parole · vismaz 12 zīmes</span><input name="next" type="password" autocomplete="new-password" minlength="12" required></label></div>
@@ -693,6 +710,27 @@
         state.data.global = payload.global;
         setDirty(payload.dirty);
         toast(payload.message);
+      } catch (error) { toast(error.message, "error"); }
+    });
+    const notifyForm = workspace.querySelector("[data-notify-form]");
+    notifyForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      const body = Object.fromEntries(form);
+      body.email_enabled = form.get("email_enabled") === "on";
+      try {
+        const payload = await api("save-notify", { method: "POST", body });
+        state.data.notify = payload.notify;
+        toast(payload.message);
+        renderSettings();
+      } catch (error) { toast(error.message, "error"); }
+    });
+    workspace.querySelector("[data-notify-clear]")?.addEventListener("click", async () => {
+      try {
+        const payload = await api("save-notify", { method: "POST", body: { email: state.data.notify?.email || "", email_enabled: state.data.notify?.email_enabled !== false, telegram_clear: true } });
+        state.data.notify = payload.notify;
+        toast("Telegram paziņojumi atslēgti.");
+        renderSettings();
       } catch (error) { toast(error.message, "error"); }
     });
     workspace.querySelector("[data-password-form]")?.addEventListener("submit", async (event) => {
@@ -731,9 +769,80 @@
     }));
   };
 
+
+  const leadIssueLabel = (lead) => lead.issue || "—";
+  const updateLeadsBadge = (count) => {
+    const badge = document.querySelector("[data-leads-count]");
+    if (!badge) return;
+    const value = Number(count) || 0;
+    badge.textContent = String(value);
+    badge.hidden = value === 0;
+  };
+
+  const renderLeads = async () => {
+    workspace.innerHTML = `<div class="workspace-inner">${renderIntro("Pieteikumi", "Katrs pieprasījums no vietnes.", "Kopija saglabājas šeit arī tad, ja klients aizver WhatsApp. Jaunie pieteikumi ir izcelti; pēc zvana atzīmējiet tos kā apstrādātus.")}<div class="loading-state" data-loading-inline><span class="loader"></span><p>Ielādē pieteikumus…</p></div></div>`;
+    let leads = [];
+    try {
+      const payload = await api("leads");
+      leads = payload.leads || [];
+      updateLeadsBadge(payload.leads_new);
+    } catch (error) { toast(error.message, "error"); }
+    const filter = state.leadFilter || "all";
+    const shown = leads.filter((lead) => filter === "all" || (filter === "new" ? lead.status !== "done" : lead.status === "done"));
+    const row = (lead) => {
+      const isNew = lead.status !== "done";
+      const notified = lead.notified || {};
+      const channels = [notified.email ? "e-pasts" : null, notified.telegram ? "Telegram" : null].filter(Boolean).join(", ");
+      return `<article class="lead-row${isNew ? " is-new" : ""}" data-lead="${escapeHtml(lead.id)}">
+        <div class="lead-row__main">
+          <strong>${escapeHtml(lead.name || "—")} · <a href="tel:${escapeHtml(lead.phone_tel || lead.phone)}">${escapeHtml(lead.phone)}</a></strong>
+          <small>${escapeHtml(formatDate(lead.at))} · ${escapeHtml(leadIssueLabel(lead))} · ${escapeHtml((lead.language || "lv").toUpperCase())}${channels ? ` · paziņots: ${escapeHtml(channels)}` : " · paziņojums nav nosūtīts"}</small>
+          ${lead.details ? `<p>${escapeHtml(lead.details)}</p>` : ""}
+          <div class="lead-row__links">
+            ${lead.map ? `<a href="${escapeHtml(lead.map)}" target="_blank" rel="noopener">Karte ↗</a>` : ""}
+            <a href="https://wa.me/${escapeHtml((lead.phone_tel || "").replace(/\D/g, ""))}" target="_blank" rel="noopener">WhatsApp ↗</a>
+            <a href="tel:${escapeHtml(lead.phone_tel || lead.phone)}">Zvanīt</a>
+          </div>
+        </div>
+        <div class="lead-row__actions">
+          <span class="lead-status ${isNew ? "is-new" : ""}">${isNew ? "Jauns" : `Apstrādāts${lead.handled_by ? ` · ${escapeHtml(lead.handled_by)}` : ""}`}</span>
+          <button class="button button--small${isNew ? " button--primary" : " button--ghost"}" type="button" data-lead-status="${isNew ? "done" : "new"}">${isNew ? "Apstrādāts" : "Atkal jauns"}</button>
+          <button class="button button--small button--danger" type="button" data-lead-delete>Dzēst</button>
+        </div>
+      </article>`;
+    };
+    workspace.innerHTML = `<div class="workspace-inner">
+      ${renderIntro("Pieteikumi", "Katrs pieprasījums no vietnes.", "Kopija saglabājas šeit arī tad, ja klients aizver WhatsApp. Jaunie pieteikumi ir izcelti; pēc zvana atzīmējiet tos kā apstrādātus.", `<div class="filter-group" role="group" aria-label="Filtrs">${[["all", "Visi"], ["new", "Jaunie"], ["done", "Apstrādātie"]].map(([key, label]) => `<button type="button" data-lead-filter="${key}" class="${filter === key ? "is-active" : ""}">${label}</button>`).join("")}</div>`)}
+      ${shown.length ? `<div class="lead-list">${shown.map(row).join("")}</div>` : `<div class="empty-state"><strong>${leads.length ? "Šajā filtrā pieteikumu nav" : "Pieteikumu vēl nav"}</strong><p>Kad apmeklētājs aizpildīs formu vietnē, pieteikums parādīsies šeit un tiks nosūtīts uz e-pastu vai Telegram (skat. Kontakti → Paziņojumi).</p></div>`}
+      <p class="data-note">Glabājas vārds, tālrunis, situācija un vietas apraksts. Foto netiek saglabāti — tie nonāk tikai WhatsApp.</p>
+    </div>`;
+    workspace.querySelectorAll("[data-lead-filter]").forEach((button) => button.addEventListener("click", () => { state.leadFilter = button.dataset.leadFilter; renderLeads(); }));
+    workspace.querySelectorAll("[data-lead-status]").forEach((button) => button.addEventListener("click", async () => {
+      const id = button.closest("[data-lead]").dataset.lead;
+      try {
+        const payload = await api("lead-status", { method: "POST", body: { id, status: button.dataset.leadStatus } });
+        updateLeadsBadge(payload.leads_new);
+        toast(payload.message);
+        renderLeads();
+      } catch (error) { toast(error.message, "error"); }
+    }));
+    workspace.querySelectorAll("[data-lead-delete]").forEach((button) => button.addEventListener("click", async () => {
+      const id = button.closest("[data-lead]").dataset.lead;
+      if (!await confirmAction("Dzēst pieteikumu?", "Ieraksts tiks dzēsts neatgriezeniski.", true)) return;
+      try {
+        const payload = await api("lead-delete", { method: "POST", body: { id } });
+        updateLeadsBadge(payload.leads_new);
+        toast(payload.message);
+        renderLeads();
+      } catch (error) { toast(error.message, "error"); }
+    }));
+  };
+
   const renderView = () => {
     if (!state.data) return;
+    updateLeadsBadge(state.data.leads_new);
     if (state.view === "analytics") renderAnalytics();
+    else if (state.view === "leads") renderLeads();
     else if (state.view === "pages") renderPages();
     else if (state.view === "media") renderMedia();
     else if (state.view === "optimization") renderOptimization();
