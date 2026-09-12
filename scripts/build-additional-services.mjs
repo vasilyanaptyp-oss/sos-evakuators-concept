@@ -7,7 +7,7 @@ const PRODUCTION = process.argv.includes("--production");
 const BASE = PRODUCTION
   ? "https://autopalidziba.lv"
   : "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
-const VERSION = "20260910-ems-studio";
+const VERSION = "20260912-wells";
 const LANGS = ["lv", "ru", "en"];
 const ROUTES = {
   hub: { lv: ["citi-pakalpojumi"], ru: ["ru", "drugie-uslugi"], en: ["en", "other-services"] },
@@ -65,6 +65,46 @@ const FITNESS = {
     instagram: "EMS Fit Studio on Instagram", directoryText: "20-minute EMS training at Cietokšņa iela 44 in Daugavpils.", dockCall: "Book now", dockRoute: "Directions"
   }
 };
+const WELLS_PHONE = "+37122002700";
+const WELLS_PHONE_LABEL = "+371 22002700";
+const WELLS = {
+  lv: {
+    title: "Aku tīrīšana Daugavpilī un visā Latgalē | AUTOPALĪDZĪBA.LV",
+    description: "Dzeramā ūdens un saimniecības aku tīrīšana Daugavpilī un visā Latgalē: dūņu un smilšu izsūknēšana, dibena un sienu tīrīšana, dezinfekcija. Izbraukums uz vietas. Zvaniet +371 22002700.",
+    eyebrow: "Aku tīrīšana Daugavpilī un visā Latgalē", heading: "Tīra aka. Tīrs ūdens.",
+    lead: "Profesionāli tīrām un apkopjam dzeramā ūdens un saimniecības akas Daugavpilī un visā Latgalē. Izsūknējam dūņas, smiltis un netīrumus, iztīrām akas dibenu un sienas, pēc nepieciešamības veicam dezinfekciju.",
+    statusKicker: "Daugavpils · Latgale", listKicker: "Ko darām", listHeading: "Viss, kas akai vajadzīgs.",
+    points: ["Aku tīrīšana no dūņām un smiltīm", "Piesārņotā ūdens izsūknēšana", "Dibena un sienu tīrīšana", "Akas dezinfekcija", "Akas stāvokļa apsekošana", "Izbraukums pa Daugavpili un visu Latgali"],
+    regionKicker: "Kur strādājam", regionHeading: "Visa Latgale.",
+    regionText: "Daugavpils, Krāslava, Preiļi, Līvāni, Rēzekne, Ludza, Balvi, Alūksne, Jēkabpils un citas reģiona apdzīvotās vietas.",
+    cta: "Vajadzīga akas tīrīšana? Zvaniet — atbrauksim uz vietas un novērtēsim darbu apjomu.", call: "Zvanīt", dockCall: "Zvanīt",
+    directoryText: "Dūņu un smilšu izsūknēšana, dibena un sienu tīrīšana, dezinfekcija. Daugavpils un visa Latgale."
+  },
+  ru: {
+    title: "Чистка колодцев в Даугавпилсе и по всей Латгалии | AUTOPALĪDZĪBA.LV",
+    description: "Чистка и обслуживание питьевых и хозяйственных колодцев в Даугавпилсе и по всей Латгалии: откачка ила и песка, очистка дна и стенок, дезинфекция. Выезд на место. Звоните +371 22002700.",
+    eyebrow: "Чистка колодцев в Даугавпилсе и по всей Латгалии", heading: "Чистый колодец. Чистая вода.",
+    lead: "Профессионально чистим и обслуживаем питьевые и хозяйственные колодцы в Даугавпилсе и по всей Латгалии. Удаляем ил, песок, грязь и другие загрязнения, очищаем дно и стенки колодца, при необходимости выполняем дезинфекцию.",
+    statusKicker: "Даугавпилс · Латгалия", listKicker: "Что делаем", listHeading: "Всё, что нужно колодцу.",
+    points: ["Чистка колодцев от ила и песка", "Откачка загрязнённой воды", "Очистка дна и стенок", "Дезинфекция колодца", "Осмотр состояния колодца", "Выезд по Даугавпилсу и всей Латгалии"],
+    regionKicker: "Где работаем", regionHeading: "Вся Латгалия.",
+    regionText: "Даугавпилс, Краслава, Прейли, Ливаны, Резекне, Лудза, Балви, Алуксне, Екабпилс и другие населённые пункты региона.",
+    cta: "Нужна чистка колодца? Звоните — приедем на место и оценим объём работ.", call: "Позвонить", dockCall: "Позвонить",
+    directoryText: "Откачка ила и песка, очистка дна и стенок, дезинфекция. Даугавпилс и вся Латгалия."
+  },
+  en: {
+    title: "Well cleaning in Daugavpils and across Latgale | AUTOPALĪDZĪBA.LV",
+    description: "Cleaning and maintenance of drinking-water and household wells in Daugavpils and across Latgale: silt and sand removal, cleaning of the bottom and walls, disinfection. We come to you. Call +371 22002700.",
+    eyebrow: "Well cleaning in Daugavpils and across Latgale", heading: "A clean well. Clean water.",
+    lead: "We professionally clean and maintain drinking-water and household wells in Daugavpils and across Latgale. We remove silt, sand and dirt, clean the bottom and walls of the well and disinfect it when needed.",
+    statusKicker: "Daugavpils · Latgale", listKicker: "What we do", listHeading: "Everything a well needs.",
+    points: ["Removal of silt and sand", "Pumping out contaminated water", "Cleaning of the bottom and walls", "Well disinfection", "Well condition inspection", "We travel across Daugavpils and all of Latgale"],
+    regionKicker: "Where we work", regionHeading: "All of Latgale.",
+    regionText: "Daugavpils, Krāslava, Preiļi, Līvāni, Rēzekne, Ludza, Balvi, Alūksne, Jēkabpils and other places in the region.",
+    cta: "Need your well cleaned? Call us — we will come, look and estimate the work.", call: "Call", dockCall: "Call",
+    directoryText: "Silt and sand removal, cleaning of the bottom and walls, disinfection. Daugavpils and all of Latgale."
+  }
+};
 const C = {
   lv: {skip:"Pāriet uz saturu",brand:"AUTOPALĪDZĪBA.LV — sākums",navAria:"Galvenā navigācija",mobileAria:"Mobilā navigācija",menuOpen:"Atvērt izvēlni",nav:["Pakalpojumi","Transports","Cenas","Galerija","Citi pakalpojumi","Kontakti"],hub:"Citi pakalpojumi",accent:"Citi pakalpojumi.",eyebrow:"Atsevišķa sadaļa",count:"3 virzieni",note:"Katram pakalpojumam ir sava lapa. Publicējam tikai pārbaudītu informāciju un apstiprinātus saziņas datus.",list:"01 / Pakalpojumu saraksts",choose:"Izvēlieties virzienu.",info:"Informācija un materiāli tiks papildināti.",services:{wells:"Aku tīrīšana",waste:"Atkritumu izvešana",fitness:"Fitness"},preparing:"Saturs tiek gatavots",status:"Informācija tiks papildināta pēc reālo materiālu saņemšanas.",placeholder:"Vieta pārbaudītai informācijai.",placeholderText:"Šajā lapā netiek publicēti pieņēmumi. Pakalpojuma apraksts, attēli un saziņas informācija tiks pievienota pēc klienta apstiprinājuma.",planned:"Plānotais saturs",rows:["Pakalpojuma apraksts","Reāli darbu materiāli","Apstiprināta saziņas informācija"],all:"← Visi papildu pakalpojumi",main:"Galvenā lapa",back:"Atgriezties galvenajā lapā →",call:"Zvanīt",location:"Jūsu atrašanās vieta",faster:"Ātrākai palīdzībai",locationTitle:"Jūsu atrašanās vieta.",locationText:"Pēc atļaujas saņemšanas sagatavosim īsziņu ar precīzu kartes saiti. Jūs varēsiet to pārbaudīt pirms nosūtīšanas.",locate:"Noteikt manu atrašanās vietu",fallback:"Vai vienkārši zvanīt +371 22002700",close:"Aizvērt"},
   ru: {skip:"Перейти к содержимому",brand:"AUTOPALĪDZĪBA.LV — главная",navAria:"Основная навигация",mobileAria:"Мобильная навигация",menuOpen:"Открыть меню",nav:["Услуги","Транспорт","Цены","Галерея","Другие услуги","Контакты"],hub:"Другие услуги",accent:"Другие услуги.",eyebrow:"Отдельный раздел",count:"3 направления",note:"Для каждой услуги создана отдельная страница. Публикуем только проверенную информацию и подтверждённые контакты.",list:"01 / Список услуг",choose:"Выберите направление.",info:"Информация и материалы будут добавлены позже.",services:{wells:"Очистка колодцев",waste:"Вывоз мусора",fitness:"Фитнес"},preparing:"Содержание готовится",status:"Информация будет добавлена после получения реальных материалов.",placeholder:"Место для проверенной информации.",placeholderText:"На этой странице не публикуются предположения. Описание услуги, фотографии и контактная информация появятся после подтверждения клиента.",planned:"Планируемое содержание",rows:["Описание услуги","Реальные материалы с работ","Подтверждённая контактная информация"],all:"← Все дополнительные услуги",main:"Главная страница",back:"Вернуться на главную →",call:"Позвонить",location:"Ваше местоположение",faster:"Для быстрой помощи",locationTitle:"Ваше местоположение.",locationText:"После разрешения мы подготовим сообщение с точной ссылкой на карту. Вы сможете проверить его перед отправкой.",locate:"Определить моё местоположение",fallback:"Или просто позвонить +371 22002700",close:"Закрыть"},
@@ -75,7 +115,7 @@ const esc = (s) => String(s).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",
 const absolute = (segments) => `${BASE}/${segments.join("/")}${segments.length ? "/" : ""}`;
 function rel(from, to) { const p = path.posix.relative(from.join("/"), to.join("/")) || "."; return p === "." ? "./" : `${p}/`; }
 function languages(lang,page,from){return LANGS.map(code=>`<a href="${rel(from,ROUTES[page][code])}" lang="${code}" hreflang="${code}"${code===lang?' aria-current="true"':""}>${code.toUpperCase()}</a>`).join("");}
-function head(lang,page,title,description,from,ogImage){const canonical=absolute(ROUTES[page][lang]);const pageRobots=PRODUCTION?(["hub","fitness"].includes(page)?"index, follow":"noindex, follow"):"noindex, nofollow";const alternates=LANGS.map(code=>`<link rel="alternate" hreflang="${code}" href="${absolute(ROUTES[page][code])}">`).join("\n  ");return `<meta charset="utf-8">
+function head(lang,page,title,description,from,ogImage){const canonical=absolute(ROUTES[page][lang]);const pageRobots=PRODUCTION?(["hub","fitness","wells"].includes(page)?"index, follow":"noindex, follow"):"noindex, nofollow";const alternates=LANGS.map(code=>`<link rel="alternate" hreflang="${code}" href="${absolute(ROUTES[page][code])}">`).join("\n  ");return `<meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0d0f11">
   <meta name="robots" content="${pageRobots}">
@@ -114,7 +154,7 @@ function shell(lang,page,main,title,description,options={}){const t=C[lang],from
   <script src="${rel(from,[])}assets/js/analytics.js?v=20260910-private-insights" defer></script>
 </body>
 </html>\n`;}
-function hub(lang){const t=C[lang],from=ROUTES.hub[lang];const items=["wells","waste","fitness"].map((key,i)=>`<a class="directory-item" href="${rel(from,ROUTES[key][lang])}"><span class="directory-item__number">0${i+1}</span><div class="directory-item__copy"><h3>${t.services[key]}</h3><p>${key==="fitness"?FITNESS[lang].directoryText:t.info}</p></div><span class="directory-item__arrow" aria-hidden="true">↗</span></a>`).join("");const main=`<section class="directory-hero" aria-labelledby="page-title"><div class="directory-hero__inner"><div><p class="eyebrow">${t.eyebrow}</p><h1 id="page-title">${t.accent}</h1></div><p class="hero-note"><strong>${t.count}</strong>${t.note}</p></div></section><section class="directory" aria-labelledby="directory-title"><div class="directory__head"><p class="section-index">${t.list}</p><h2 id="directory-title">${t.choose}</h2></div><nav class="directory-list" aria-label="${t.hub}">${items}</nav></section>`;return shell(lang,"hub",main,`${t.hub} | AUTOPALĪDZĪBA.LV`,t.note);}
+function hub(lang){const t=C[lang],from=ROUTES.hub[lang];const items=["wells","waste","fitness"].map((key,i)=>`<a class="directory-item" href="${rel(from,ROUTES[key][lang])}"><span class="directory-item__number">0${i+1}</span><div class="directory-item__copy"><h3>${t.services[key]}</h3><p>${key==="fitness"?FITNESS[lang].directoryText:key==="wells"?WELLS[lang].directoryText:t.info}</p></div><span class="directory-item__arrow" aria-hidden="true">↗</span></a>`).join("");const main=`<section class="directory-hero" aria-labelledby="page-title"><div class="directory-hero__inner"><div><p class="eyebrow">${t.eyebrow}</p><h1 id="page-title">${t.accent}</h1></div><p class="hero-note"><strong>${t.count}</strong>${t.note}</p></div></section><section class="directory" aria-labelledby="directory-title"><div class="directory__head"><p class="section-index">${t.list}</p><h2 id="directory-title">${t.choose}</h2></div><nav class="directory-list" aria-label="${t.hub}">${items}</nav></section>`;return shell(lang,"hub",main,`${t.hub} | AUTOPALĪDZĪBA.LV`,t.note);}
 function fitness(lang) {
   const t = C[lang], f = FITNESS[lang], from = ROUTES.fitness[lang];
   const hubHref = rel(from, ROUTES.hub[lang]), root = rel(from, []);
@@ -138,6 +178,16 @@ function fitness(lang) {
   </section>`;
   return shell(lang, "fitness", main, f.title, f.description, { phone: EMS_PHONE, dockCall: f.dockCall, dockSecondary: f.dockRoute, dockSecondaryHref: EMS_MAP, fitnessDock: true, ogImage: "assets/images/ems-fit-studio-training.webp" });
 }
-function service(lang,key){if(key==="fitness")return fitness(lang);const t=C[lang],from=ROUTES[key][lang],name=t.services[key],hubHref=rel(from,ROUTES.hub[lang]),number=String(["wells","waste","fitness"].indexOf(key)+1).padStart(2,"0");const main=`<section class="service-hero" aria-labelledby="page-title"><div class="service-hero__inner"><div class="service-hero__meta"><div><nav class="breadcrumb" aria-label="${t.hub}"><a href="${hubHref}">${t.hub}</a><span aria-hidden="true">/</span><span>${name}</span></nav><h1 id="page-title">${name}.</h1></div><p class="service-status"><strong>${t.preparing}</strong>${t.status}</p></div></div></section><section class="placeholder-section" aria-labelledby="placeholder-title"><div class="placeholder-grid"><div class="placeholder-copy"><p class="section-index">${number} / ${name}</p><h2 id="placeholder-title">${t.placeholder}</h2><p>${t.placeholderText}</p></div><div class="placeholder-panel" aria-label="${t.planned}">${t.rows.map((row,i)=>`<div class="placeholder-row"><span>0${i+1}</span><strong>${row}</strong></div>`).join("")}</div></div><div class="page-actions"><a class="page-action" href="${hubHref}">${t.all}</a><a class="page-action page-action--secondary" href="${rel(from,HOME[lang])}">${t.main}</a></div></section>`;return shell(lang,key,main,`${name} | ${t.hub}`,t.status);}
+function wells(lang) {
+  const t = C[lang], w = WELLS[lang], from = ROUTES.wells[lang];
+  const hubHref = rel(from, ROUTES.hub[lang]);
+  const points = w.points.map((point, i) => `<li><span>0${i + 1}</span>${point}</li>`).join("");
+  const main = `<section class="service-hero" aria-labelledby="page-title"><div class="service-hero__inner"><div class="service-hero__meta"><div><nav class="breadcrumb" aria-label="${t.hub}"><a href="${hubHref}">${t.hub}</a><span aria-hidden="true">/</span><span>${t.services.wells}</span></nav><p class="wells-kicker">${w.eyebrow}</p><h1 id="page-title">${w.heading}</h1></div><p class="service-status"><strong>${w.statusKicker}</strong>${w.lead}</p></div></div></section>
+  <section class="wells" aria-labelledby="wells-title"><div class="wells__grid"><div class="wells__copy"><p class="section-index">01 / ${w.listKicker}</p><h2 id="wells-title">${w.listHeading}</h2><ul class="wells__list">${points}</ul></div>
+    <aside class="wells__panel"><p class="section-index">02 / ${w.regionKicker}</p><h2>${w.regionHeading}</h2><p class="wells__regions">${w.regionText}</p><p class="wells__cta">${w.cta}</p><a class="page-action wells__call" data-dock-watch href="tel:${WELLS_PHONE}"><span>${w.call}</span><strong>${WELLS_PHONE_LABEL}</strong></a></aside></div>
+    <div class="page-actions"><a class="page-action page-action--secondary" href="${hubHref}">${t.all}</a><a class="page-action page-action--secondary" href="${rel(from,HOME[lang])}">${t.main}</a></div></section>`;
+  return shell(lang, "wells", main, w.title, w.description, { phone: WELLS_PHONE, dockCall: w.dockCall });
+}
+function service(lang,key){if(key==="fitness")return fitness(lang);if(key==="wells")return wells(lang);const t=C[lang],from=ROUTES[key][lang],name=t.services[key],hubHref=rel(from,ROUTES.hub[lang]),number=String(["wells","waste","fitness"].indexOf(key)+1).padStart(2,"0");const main=`<section class="service-hero" aria-labelledby="page-title"><div class="service-hero__inner"><div class="service-hero__meta"><div><nav class="breadcrumb" aria-label="${t.hub}"><a href="${hubHref}">${t.hub}</a><span aria-hidden="true">/</span><span>${name}</span></nav><h1 id="page-title">${name}.</h1></div><p class="service-status"><strong>${t.preparing}</strong>${t.status}</p></div></div></section><section class="placeholder-section" aria-labelledby="placeholder-title"><div class="placeholder-grid"><div class="placeholder-copy"><p class="section-index">${number} / ${name}</p><h2 id="placeholder-title">${t.placeholder}</h2><p>${t.placeholderText}</p></div><div class="placeholder-panel" aria-label="${t.planned}">${t.rows.map((row,i)=>`<div class="placeholder-row"><span>0${i+1}</span><strong>${row}</strong></div>`).join("")}</div></div><div class="page-actions"><a class="page-action" href="${hubHref}">${t.all}</a><a class="page-action page-action--secondary" href="${rel(from,HOME[lang])}">${t.main}</a></div></section>`;return shell(lang,key,main,`${name} | ${t.hub}`,t.status);}
 for(const lang of LANGS){for(const page of Object.keys(ROUTES)){const html=page==="hub"?hub(lang):service(lang,page),dir=path.join(ROOT,...ROUTES[page][lang]);fs.mkdirSync(dir,{recursive:true});fs.writeFileSync(path.join(dir,"index.html"),html);}}
 console.log(`Additional services: 12 localized pages written (${PRODUCTION ? "production" : "concept"})`);

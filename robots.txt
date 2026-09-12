@@ -1,7 +1,7 @@
-# Concept build.
-# Indexability is controlled by the <meta name="robots"> tag on each page (noindex, nofollow).
+# Production build.
+# Indexability is controlled by the <meta name="robots"> tag on each page (index, follow).
 User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://vasilyanaptyp-oss.github.io/sos-evakuators-concept/sitemap.xml
+Sitemap: https://autopalidziba.lv/sitemap.xml

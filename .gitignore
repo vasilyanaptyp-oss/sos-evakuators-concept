@@ -12,3 +12,4 @@ admin/storage/revisions/
 admin/storage/*.lock
 assets/uploads/*
 !assets/uploads/.htaccess
+_shots/

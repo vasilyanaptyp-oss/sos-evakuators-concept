@@ -96,8 +96,8 @@ button{color:inherit}
 .hero-edge{position:absolute;left:0;right:0;bottom:0;height:22px;display:flex;overflow:hidden;transform:skewX(-35deg)}
 .hero-edge span{min-width:78px;flex:1;background:var(--yellow);border-right:28px solid var(--ink)}
 .second-call-strip{background:var(--ink);color:var(--white);padding:1.35rem 3vw;border-bottom:1px solid rgba(255,255,255,.12)}
-.second-call-strip p{width:var(--container);margin:0 auto;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:.4rem .8rem;font-size:.82rem;font-weight:620;letter-spacing:.06em;color:rgba(255,255,255,.62);text-align:center}
-.second-call-strip a{color:var(--white);font-weight:680;font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(244,197,49,.55);padding-bottom:.15rem;transition:color .25s,border-color .25s}
+.second-call-strip p{width:var(--container);margin:0 auto;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:.4rem 1rem;font-size:.92rem;font-weight:620;letter-spacing:.06em;color:rgba(255,255,255,.62);text-align:center}
+.second-call-strip a{color:var(--white);font-size:1.45rem;font-weight:720;font-variant-numeric:tabular-nums;letter-spacing:0;border-bottom:1px solid rgba(244,197,49,.55);padding-bottom:.15rem;transition:color .25s,border-color .25s}
 .second-call-strip a:hover{color:var(--yellow);border-color:var(--yellow)}
 .marquee{overflow:hidden;background:var(--yellow);color:var(--ink);border-bottom:1px solid var(--ink);height:76px;display:flex;align-items:center}
 .marquee-track{display:flex;align-items:center;width:max-content;animation:marquee 32s linear infinite;white-space:nowrap;will-change:transform}

@@ -178,3 +178,21 @@ button{font:inherit;color:inherit}
 .eyebrow{display:flex;align-items:center;gap:.8rem;margin:0 0 1.6rem;font-size:.72rem;line-height:1.2;font-weight:680;text-transform:uppercase;letter-spacing:.16em;color:#595b57}
 .eyebrow span{display:block;width:28px;height:2px;background:var(--yellow)}
 .sheet-open{overflow:hidden}
+
+/* Aku tīrīšana */
+.wells-kicker{margin:0 0 1.2rem;font-size:.72rem;font-weight:760;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow)}
+.wells{padding:clamp(4.5rem,9vw,8rem) 3vw clamp(4rem,8vw,7rem)}
+.wells__grid{width:var(--container);margin:0 auto;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:clamp(3rem,8vw,9rem);align-items:start}
+.wells__copy h2,.wells__panel h2{margin:0;font-size:clamp(2.6rem,5.5vw,5.6rem);font-weight:820;letter-spacing:-.07em;line-height:.9;text-wrap:balance}
+.wells__list{margin:2.4rem 0 0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.wells__list li{display:grid;grid-template-columns:42px 1fr;gap:1rem;align-items:center;min-height:72px;border-bottom:1px solid var(--line);font-size:clamp(1.02rem,1.5vw,1.3rem);font-weight:690;letter-spacing:-.02em}
+.wells__list li span{font-size:.64rem;letter-spacing:.12em;color:var(--muted)}
+.wells__panel{position:sticky;top:6rem;padding:clamp(1.6rem,3vw,2.6rem);background:var(--ink);color:var(--white)}
+.wells__panel .section-index{color:var(--yellow)}
+.wells__regions{margin:1.6rem 0 0;font-size:clamp(1rem,1.3vw,1.15rem);line-height:1.6;color:rgba(255,255,255,.78)}
+.wells__cta{margin:1.6rem 0 1.4rem;padding-top:1.4rem;border-top:1px solid rgba(255,255,255,.18);font-size:.98rem;font-weight:640}
+.wells__call{display:flex;justify-content:space-between;gap:1rem;width:100%;min-height:64px;text-transform:none;letter-spacing:0}
+.wells__call span{font-size:.72rem;font-weight:760;letter-spacing:.12em;text-transform:uppercase}
+.wells__call strong{font-size:1.25rem;font-variant-numeric:tabular-nums}
+.wells .page-actions{width:var(--container);margin:clamp(3rem,6vw,5rem) auto 0;display:flex;flex-wrap:wrap;gap:.8rem}
+@media (max-width:900px){.wells{padding-left:5vw;padding-right:5vw}.wells__grid{width:100%;grid-template-columns:1fr;gap:3rem}.wells__panel{position:static}.wells .page-actions{width:100%;display:grid}}
