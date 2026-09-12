@@ -908,6 +908,7 @@
       body.dataset.csrf = state.data.csrf;
       pageCount.textContent = state.data.pages.length;
       setDirty(state.data.dirty);
+      updateLeadsBadge(state.data.leads_new);
       loading.hidden = true;
       workspace.hidden = false;
       renderDashboard();
