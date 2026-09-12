@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { LANGS, LANG_META, SERVICES, T, BUSINESS, SERVICE_OG } from "./site-content.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const ASSETS_V = "20260912-second-number";
+const ASSETS_V = "20260912-bots";
 const ANALYTICS_V = "20260910-private-insights";
 const CONCEPT_BASE = "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
 const PRODUCTION_BASE = "https://autopalidziba.lv";
