@@ -207,6 +207,7 @@
         <article class="stat-card"><p>Apmeklētāji · 30 d.</p><strong>${formatNumber(analytics.unique_visitors)}</strong><small>anonīmas pārlūka sesijas</small></article>
         <article class="stat-card"><p>Tālruņa klikšķi · 30 d.</p><strong>${formatNumber(analytics.phone_clicks)}</strong><small>nevis savienoti zvani</small></article>
         <article class="stat-card"><p>Palīdzības darbības · 30 d.</p><strong>${formatNumber(analytics.help_actions)}</strong><small>zvans, WhatsApp, vieta vai pieprasījums</small></article>
+        <article class="stat-card"><p>Lapu skatījumi · 30 d.</p><strong>${formatNumber(analytics.page_views)}</strong><small>visas vietnes lapas un valodas</small></article>
       </section>
       <div class="dashboard-grid">
         <section class="panel">
