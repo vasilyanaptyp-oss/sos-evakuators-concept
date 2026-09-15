@@ -207,7 +207,7 @@ function cms_sync_unedited_baseline(string $page): void
     $sourceHtml = @file_get_contents($source);
     $baselineHtml = @file_get_contents($baseline);
     // A CMS-published file carries replaced phones, prices or hidden pages: only fresh deployments may refresh the baseline.
-    if (is_string($sourceHtml) && str_contains($sourceHtml, CMS_PUBLISHED_MARK)) {
+    if (is_string($sourceHtml) && strpos($sourceHtml, CMS_PUBLISHED_MARK) !== false) {
         return;
     }
     if ($sourceHtml === false || $baselineHtml === false || hash_equals(hash('sha256', $sourceHtml), hash('sha256', $baselineHtml))) {
@@ -618,7 +618,7 @@ function cms_render_page(string $page, array $state): string
     $output = $rendered === false ? $html : cms_restore_utf8($rendered);
     $output = (string) preg_replace('/analytics\.js\?v=[A-Za-z0-9._-]+/', 'analytics.js?v=' . CMS_ANALYTICS_VERSION, $output);
     // Marker: a file with it was written by the CMS, so the baseline must never be re-synced from it.
-    if (!str_contains($output, CMS_PUBLISHED_MARK)) {
+    if (strpos($output, CMS_PUBLISHED_MARK) === false) {
         $output = (string) preg_replace('#\s*</html>\s*$#i', "
 " . CMS_PUBLISHED_MARK . "
 </html>
