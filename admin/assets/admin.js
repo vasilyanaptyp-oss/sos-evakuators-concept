@@ -156,10 +156,21 @@
   };
 
   const resetViewPosition = (focusContent = false) => {
-    window.requestAnimationFrame(() => {
+    const reset = () => {
       window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      body.scrollTop = 0;
       if (workspaceRoot) workspaceRoot.scrollTop = 0;
+    };
+
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    reset();
+    window.requestAnimationFrame(() => {
+      reset();
       if (focusContent && mobileNavigation.matches) workspaceRoot?.focus({ preventScroll: true });
+      window.setTimeout(reset, 120);
     });
   };
 

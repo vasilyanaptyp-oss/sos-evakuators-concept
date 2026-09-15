@@ -248,7 +248,7 @@ img { max-width: 100%; }
 .draft-state.is-live i { background: var(--green); }
 .mobile-nav-toggle { display: none; }
 
-.workspace { padding: clamp(26px, 4vw, 62px); }
+.workspace { padding: clamp(26px, 4vw, 62px); overflow-anchor: none; }
 .workspace-inner { width: min(1440px, 100%); margin: 0 auto; }
 .loading-state { display: grid; min-height: 55vh; place-items: center; align-content: center; gap: 16px; color: var(--muted); }
 .loader { width: 34px; height: 34px; border: 2px solid var(--line); border-top-color: var(--yellow); border-radius: 50%; animation: spin .8s linear infinite; }
