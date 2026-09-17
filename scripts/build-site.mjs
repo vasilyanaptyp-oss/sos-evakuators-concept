@@ -9,7 +9,7 @@ import { LANGS, LANG_META, SERVICES, T, BUSINESS, SERVICE_OG } from "./site-cont
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const ASSETS_V = "20260912-leads";
-const ANALYTICS_V = "20260912-bots";
+const ANALYTICS_V = "20260917-ads";
 const CONCEPT_BASE = "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
 const PRODUCTION_BASE = "https://autopalidziba.lv";
 const CONCEPT_ROBOTS = "noindex, nofollow";
@@ -153,7 +153,7 @@ function head({ lang, title, description, page, ogTitle, ogDescription, ogImage,
   <meta name="theme-color" content="#0d0f11">
   <meta name="robots" content="${ROBOTS}">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self' mailto:; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.google.com https://google.com https://www.google.lv https://www.google.lt https://www.google.ee https://pagead2.googlesyndication.com https://www.googleadservices.com; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' https://www.googletagmanager.com https://www.googleadservices.com https://www.google.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net; connect-src 'self' https://pagead2.googlesyndication.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://ad.doubleclick.net https://www.google.com https://google.com https://www.google.lv https://www.google.lt https://www.google.ee https://*.googletagmanager.com; frame-src https://www.googletagmanager.com https://td.doubleclick.net; object-src 'none'; base-uri 'none'; form-action 'self' mailto:; upgrade-insecure-requests">
   <meta name="description" content="${esc(description)}">
   <meta property="og:title" content="${esc(ogTitle)}">
   <meta property="og:description" content="${esc(ogDescription)}">

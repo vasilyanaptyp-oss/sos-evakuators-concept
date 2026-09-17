@@ -1,9 +1,10 @@
 /*
  * SOS Evakuators — analytics preparation layer.
  *
- * STATUS: Private first-party counters are enabled. Google Analytics and
- * Google Ads remain disabled until real IDs are filled in AND consent is
- * granted. There are deliberately NO placeholder IDs in this file.
+ * STATUS: Private first-party counters are enabled. Google Ads conversions
+ * (phone click, WhatsApp) are enabled since 17.09.2026: the Google tag loads
+ * in Consent Mode v2 with everything denied (no cookies) and a small banner
+ * lets the visitor allow ad cookies. Google Analytics stays off (no GA4 ID).
  *
  * WHAT IT DOES TODAY:
  *   - sends anonymous aggregate counters to this site's /track.php endpoint;
@@ -39,11 +40,13 @@
 (() => {
   const CONFIG = {
     ga4MeasurementId: "",            // e.g. "G-XXXXXXXXXX" — leave "" to keep disabled
-    adsConversion: { id: "", label: "" }, // e.g. { id: "AW-XXXXXXXXX", label: "xxxxxxxxxxxx" }
-    adsPhoneConversion: { id: "", label: "" } // optional separate call-related conversion
+    adsConversion: { id: "AW-749354982", label: "ideMCJaZ6focEOb_qOUC" }, // WhatsApp click on the site (goal: Contact)
+    adsPhoneConversion: { id: "AW-749354982", label: "2BgfCJOZ6focEOb_qOUC" } // phone number click on the site (goal: Phone call lead)
   };
 
   window.dataLayer = window.dataLayer || [];
+  // gtag.js only reads Arguments objects from the dataLayer, never plain arrays.
+  window.gtag = window.gtag || function gtag() { window.dataLayer.push(arguments); };
   let gtagLoaded = false;
 
   // First-party counters are skipped for automation, crawlers, the admin area and
@@ -129,10 +132,7 @@
     return "";
   };
 
-  const gtagQueue = (...args) => {
-    if (gtagLoaded && typeof window.gtag === "function") window.gtag(...args);
-    window.dataLayer.push(args);
-  };
+  const gtagQueue = (...args) => window.gtag(...args);
 
   // Consent Mode v2: deny by default until the visitor agrees (see docs above).
   const defaultConsent = {
@@ -143,14 +143,16 @@
     wait_for_update: 500
   };
 
+  const adsId = CONFIG.adsConversion.id || CONFIG.adsPhoneConversion.id;
   const loadGtag = () => {
-    if (!CONFIG.ga4MeasurementId || gtagLoaded) return;
+    const tagId = CONFIG.ga4MeasurementId || adsId;
+    if (!tagId || gtagLoaded) return;
     gtagQueue("js", new Date());
-    gtagQueue("config", CONFIG.ga4MeasurementId, { anonymize_ip: true });
-    if (CONFIG.adsConversion.id) gtagQueue("config", CONFIG.adsConversion.id);
+    if (CONFIG.ga4MeasurementId) gtagQueue("config", CONFIG.ga4MeasurementId, { anonymize_ip: true });
+    if (adsId) gtagQueue("config", adsId);
     const script = document.createElement("script");
     script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(CONFIG.ga4MeasurementId)}`;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(tagId)}`;
     document.head.append(script);
     gtagLoaded = true;
   };
@@ -177,7 +179,7 @@
     const clean = sanitize(params);
     window.dataLayer.push({ event, ...clean });
     sendFirstParty(firstPartyEvent(event, clean));
-    if (gtagLoaded) {
+    if (gtagLoaded && !firstPartyMuted) {
       gtagQueue("event", event, clean);
       if (event === "call_click" || event === "whatsapp_open") sendConversion(event);
     }
@@ -193,12 +195,83 @@
         ad_user_data: state,
         ad_personalization: state
       });
-      if (granted) loadGtag();
     }
   };
 
-  // Consent Mode v2 defaults must be set before any tag loads.
+  // Consent Mode v2 defaults must be set before any tag loads. With ad_storage
+  // denied the tag sets no cookies and redacts ad click ids.
   gtagQueue("consent", "default", defaultConsent);
+  gtagQueue("set", "ads_data_redaction", true);
+
+  const CONSENT_KEY = "ap_consent";
+  let consent = "";
+  try { consent = localStorage.getItem(CONSENT_KEY) || ""; } catch (_) {}
+  if (consent === "granted") window.SOSAnalytics.setConsent(true);
+  if (!firstPartyMuted) loadGtag();
+
+  // A small non-blocking banner, shown until the visitor answers. Styled from JS
+  // because the additional-service pages forbid inline style attributes. It must
+  // never cover the main call button: on phones it waits for the call dock (the
+  // dock slides in once that button is scrolled away) and sits above it; on
+  // wider screens it stays in the bottom right corner.
+  const CONSENT_COPY = {
+    lv: { text: "Mēs izmantojam Google sīkdatnes, lai redzētu, kuras reklāmas palīdz jums mūs atrast.", yes: "Pieņemt", no: "Noraidīt", label: "Sīkdatnes" },
+    ru: { text: "Мы используем cookie Google, чтобы видеть, какая реклама помогает вам нас найти.", yes: "Принять", no: "Отказаться", label: "Cookie" },
+    en: { text: "We use Google cookies to see which ads help you find us.", yes: "Accept", no: "Decline", label: "Cookies" }
+  };
+  const showConsentBanner = () => {
+    const copy = CONSENT_COPY[(document.documentElement.lang || "lv").slice(0, 2)] || CONSENT_COPY.lv;
+    const box = document.createElement("div");
+    box.className = "consent-banner";
+    box.setAttribute("role", "region");
+    box.setAttribute("aria-label", copy.label);
+    Object.assign(box.style, {
+      position: "fixed", zIndex: "25", right: "12px", maxWidth: "440px",
+      gap: "12px", padding: "14px 16px", background: "#0d0f11", color: "#fbfaf6",
+      font: "14px/1.45 Geist, Arial, sans-serif", boxShadow: "0 12px 34px rgba(0,0,0,.28)"
+    });
+    const dock = document.querySelector(".mobile-dock");
+    const narrow = matchMedia("(max-width: 820px)");
+    const place = () => {
+      const dockUsed = !!dock && getComputedStyle(dock).display !== "none";
+      const dockShown = dockUsed && dock.classList.contains("is-visible");
+      box.style.display = narrow.matches && dockUsed && !dockShown ? "none" : "grid";
+      box.style.left = narrow.matches ? "12px" : "auto";
+      box.style.bottom = narrow.matches && dockShown ? `${Math.round(dock.getBoundingClientRect().height) + 12}px` : "16px";
+    };
+    const dockWatch = dock ? new MutationObserver(place) : null;
+    dockWatch?.observe(dock, { attributes: true, attributeFilter: ["class"] });
+    narrow.addEventListener?.("change", place);
+    const text = document.createElement("p");
+    text.textContent = copy.text;
+    text.style.margin = "0";
+    const row = document.createElement("div");
+    Object.assign(row.style, { display: "flex", gap: "8px" });
+    const choice = (label, value) => {
+      const primary = value === "granted";
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      Object.assign(button.style, {
+        flex: "1", minHeight: "44px", cursor: "pointer", font: "inherit", fontWeight: "700",
+        border: primary ? "0" : "1px solid rgba(251,250,246,.4)",
+        background: primary ? "#f4c531" : "transparent", color: primary ? "#0d0f11" : "#fbfaf6"
+      });
+      button.addEventListener("click", () => {
+        try { localStorage.setItem(CONSENT_KEY, value); } catch (_) {}
+        window.SOSAnalytics.setConsent(primary);
+        dockWatch?.disconnect();
+        narrow.removeEventListener?.("change", place);
+        box.remove();
+      });
+      return button;
+    };
+    row.append(choice(copy.no, "denied"), choice(copy.yes, "granted"));
+    box.append(text, row);
+    place();
+    document.body.append(box);
+  };
+  if (!consent && !firstPartyMuted && adsId) showConsentBanner();
 
   const startFirstParty = () => {
     sendFirstParty("page_view");
