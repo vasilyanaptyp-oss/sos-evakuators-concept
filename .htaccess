@@ -11,6 +11,16 @@ RewriteRule ^atkritumu-izvesana(?:/index\.html|/)?$ /automanipulatora-darbi/ [R=
 RewriteRule ^ru/vyvoz-musora(?:/index\.html|/)?$ /ru/uslugi-avtomanipulyatora/ [R=301,L]
 RewriteRule ^en/waste-removal(?:/index\.html|/)?$ /en/truck-mounted-crane-services/ [R=301,L]
 
+# Old site URLs (before the September 2026 relaunch) still live in Google, ads and bookmarks.
+RewriteRule ^lv/autoevakuators-daugavpils/?$ /autoevakuators/ [L,R=301]
+RewriteRule ^lv/kravas-evakuators-daugavpils/?$ /kravas-evakuators/ [L,R=301]
+RewriteRule ^lv(/.*)?$ / [L,R=301]
+RewriteRule ^ru/avtoevakuator-daugavpils/?$ /ru/avtoevakuator/ [L,R=301]
+RewriteRule ^ru/gruzovoj-evakuator-daugavpils/?$ /ru/gruzovoj-evakuator/ [L,R=301]
+RewriteRule ^ru/(uslugi-avtoservisa|uslugi-gruzovogo-avtoservisa|svarochnye-raboty-avto|konfidencialnost)/?$ /ru/ [L,R=301]
+RewriteRule ^en/(towing-service-daugavpils|tow-truck-service)/?$ /en/tow-truck/ [L,R=301]
+RewriteRule ^en/(truck-service|autoservice|auto-welding-works|Privacy-policy)/?$ /en/ [L,R=301,NC]
+
 ErrorDocument 404 /404.html
 
 <IfModule mod_headers.c>
