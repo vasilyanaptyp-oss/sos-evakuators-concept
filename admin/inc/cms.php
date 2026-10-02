@@ -15,7 +15,8 @@ const CMS_PRICE_DEFAULTS = ['auto' => '30', 'auto_km' => '0.80', 'kravas' => '15
 // Additional services listed on «Citi pakalpojumi»: the admin can hide any of them without deleting pages.
 const CMS_EXTRA_SERVICES = [
     'wells' => ['label' => 'Aku tīrīšana', 'pages' => ['lv' => 'aku-tirisana/index.html', 'ru' => 'ru/chistka-kolodtsev/index.html', 'en' => 'en/well-cleaning/index.html']],
-    'waste' => ['label' => 'Atkritumu izvešana', 'pages' => ['lv' => 'atkritumu-izvesana/index.html', 'ru' => 'ru/vyvoz-musora/index.html', 'en' => 'en/waste-removal/index.html']],
+    // Legacy key preserves existing saved visibility settings.
+    'waste' => ['label' => 'Automanipulators', 'pages' => ['lv' => 'automanipulatora-darbi/index.html', 'ru' => 'ru/uslugi-avtomanipulyatora/index.html', 'en' => 'en/truck-mounted-crane-services/index.html']],
     'fitness' => ['label' => 'EMS treniņi (EMS Fit Studio)', 'pages' => ['lv' => 'fitness/index.html', 'ru' => 'ru/fitnes/index.html', 'en' => 'en/fitness/index.html']],
 ];
 const CMS_EXTRA_HUBS = ['lv' => 'citi-pakalpojumi/index.html', 'ru' => 'ru/drugie-uslugi/index.html', 'en' => 'en/other-services/index.html'];

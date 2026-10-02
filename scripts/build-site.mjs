@@ -820,7 +820,7 @@ function sitemap() {
       const alternates = LANGS.map((l) => `    <xhtml:link rel="alternate" hreflang="${LANG_META[l].hreflang}" href="${langUrl(l, page)}"/>`).join("\n") + `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${langUrl("lv", page)}"/>`;
       entries.push(`  <url>
     <loc>${langUrl(lang, page)}</loc>
-    <lastmod>${LASTMOD}</lastmod>
+    <lastmod>${page === 'manipulators' ? '2026-10-02' : LASTMOD}</lastmod>
 ${alternates}
   </url>`);
     }
@@ -831,7 +831,7 @@ ${alternates}
       const alternates = LANGS.map((code) => `    <xhtml:link rel="alternate" hreflang="${LANG_META[code].hreflang}" href="${pageUrl(code)}"/>`).join("\n") + `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${pageUrl("lv")}"/>`;
       entries.push(`  <url>
     <loc>${pageUrl(lang)}</loc>
-    <lastmod>${LASTMOD}</lastmod>
+    <lastmod>${page === 'hub' ? '2026-10-02' : LASTMOD}</lastmod>
 ${alternates}
   </url>`);
     }

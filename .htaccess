@@ -6,6 +6,11 @@ RewriteCond %{HTTPS} !=on [OR]
 RewriteCond %{HTTP_HOST} ^www\.autopalidziba\.lv$ [NC]
 RewriteRule ^ https://autopalidziba.lv%{REQUEST_URI} [L,R=301]
 
+# Waste removal has been replaced by the existing truck-mounted crane service.
+RewriteRule ^atkritumu-izvesana(?:/index\.html|/)?$ /automanipulatora-darbi/ [R=301,L]
+RewriteRule ^ru/vyvoz-musora(?:/index\.html|/)?$ /ru/uslugi-avtomanipulyatora/ [R=301,L]
+RewriteRule ^en/waste-removal(?:/index\.html|/)?$ /en/truck-mounted-crane-services/ [R=301,L]
+
 ErrorDocument 404 /404.html
 
 <IfModule mod_headers.c>

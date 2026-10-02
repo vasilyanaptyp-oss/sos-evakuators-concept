@@ -1,20 +1,23 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { CRANE } from "./crane-content.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PRODUCTION = process.argv.includes("--production");
 const BASE = PRODUCTION
   ? "https://autopalidziba.lv"
   : "https://vasilyanaptyp-oss.github.io/sos-evakuators-concept";
-const VERSION = "20260912-leads";
+const VERSION = "20261002-crane";
 const LANGS = ["lv", "ru", "en"];
 const ROUTES = {
   hub: { lv: ["citi-pakalpojumi"], ru: ["ru", "drugie-uslugi"], en: ["en", "other-services"] },
   wells: { lv: ["aku-tirisana"], ru: ["ru", "chistka-kolodtsev"], en: ["en", "well-cleaning"] },
-  waste: { lv: ["atkritumu-izvesana"], ru: ["ru", "vyvoz-musora"], en: ["en", "waste-removal"] },
+  // Keep the legacy CMS key so saved service-visibility preferences survive.
+  waste: { lv: ["automanipulatora-darbi"], ru: ["ru", "uslugi-avtomanipulyatora"], en: ["en", "truck-mounted-crane-services"] },
   fitness: { lv: ["fitness"], ru: ["ru", "fitnes"], en: ["en", "fitness"] }
 };
+const LEGACY_WASTE = { lv: ["atkritumu-izvesana"], ru: ["ru", "vyvoz-musora"], en: ["en", "waste-removal"] };
 const HOME = { lv: [], ru: ["ru"], en: ["en"] };
 const EMS_PHONE = "+37125929439";
 const EMS_PHONE_LABEL = "+371 25 929 439";
@@ -112,10 +115,11 @@ const C = {
 };
 
 const esc = (s) => String(s).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+for (const lang of LANGS) C[lang].services.waste = CRANE[lang].name;
 const absolute = (segments) => `${BASE}/${segments.join("/")}${segments.length ? "/" : ""}`;
 function rel(from, to) { const p = path.posix.relative(from.join("/"), to.join("/")) || "."; return p === "." ? "./" : `${p}/`; }
 function languages(lang,page,from){return LANGS.map(code=>`<a href="${rel(from,ROUTES[page][code])}" lang="${code}" hreflang="${code}"${code===lang?' aria-current="true"':""}>${code.toUpperCase()}</a>`).join("");}
-function head(lang,page,title,description,from,ogImage){const canonical=absolute(ROUTES[page][lang]);const pageRobots=PRODUCTION?(["hub","fitness","wells"].includes(page)?"index, follow":"noindex, follow"):"noindex, nofollow";const alternates=LANGS.map(code=>`<link rel="alternate" hreflang="${code}" href="${absolute(ROUTES[page][code])}">`).join("\n  ");return `<meta charset="utf-8">
+function head(lang,page,title,description,from,ogImage,ogImageAlt){const canonical=absolute(ROUTES[page][lang]);const pageRobots=PRODUCTION?"index, follow":"noindex, nofollow";const alternates=LANGS.map(code=>`<link rel="alternate" hreflang="${code}" href="${absolute(ROUTES[page][code])}">`).join("\n  ");return `<meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0d0f11">
   <meta name="robots" content="${pageRobots}">
@@ -126,7 +130,7 @@ function head(lang,page,title,description,from,ogImage){const canonical=absolute
   <meta property="og:description" content="${esc(description)}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="${canonical}">
-${ogImage?`  <meta property="og:image" content="${BASE}/${ogImage}">\n  <meta property="og:image:alt" content="EMS Fit Studio Daugavpils">\n`:""}  <title>${esc(title)}</title>
+${ogImage?`  <meta property="og:image" content="${BASE}/${ogImage}">\n  <meta property="og:image:alt" content="${esc(ogImageAlt || 'EMS Fit Studio Daugavpils')}">\n`:""}  <title>${esc(title)}</title>
   <link rel="canonical" href="${canonical}">
   ${alternates}
   <link rel="alternate" hreflang="x-default" href="${absolute(ROUTES[page].lv)}">
@@ -136,7 +140,7 @@ ${ogImage?`  <meta property="og:image" content="${BASE}/${ogImage}">\n  <meta pr
 function shell(lang,page,main,title,description,options={}){const t=C[lang],from=ROUTES[page][lang],home=rel(from,HOME[lang]),hub=rel(from,ROUTES.hub[lang]),anchors=["pakalpojumi","platforma","cenas","darbi",null,"kontakti"],phone=options.phone||"+37122002700",dockCall=options.dockCall||t.call,dockSecondary=options.dockSecondary||t.location;const nav=t.nav.map((label,i)=>`<a href="${i===4?hub:`${home}#${anchors[i]}`}"${i===4?' aria-current="page"':""}>${label}</a>`).join("\n      ");return `<!doctype html>
 <html lang="${lang}">
 <head>
-  ${head(lang,page,title,description,from,options.ogImage)}
+  ${head(lang,page,title,description,from,options.ogImage,options.ogImageAlt)}
 </head>
 <body>
   <a class="skip-link" href="#saturs">${t.skip}</a>
@@ -154,7 +158,38 @@ function shell(lang,page,main,title,description,options={}){const t=C[lang],from
   <script src="${rel(from,[])}assets/js/analytics.js?v=20260912-bots" defer></script>
 </body>
 </html>\n`;}
-function hub(lang){const t=C[lang],from=ROUTES.hub[lang];const items=["wells","waste","fitness"].map((key,i)=>`<a class="directory-item" href="${rel(from,ROUTES[key][lang])}"><span class="directory-item__number">0${i+1}</span><div class="directory-item__copy"><h3>${t.services[key]}</h3><p>${key==="fitness"?FITNESS[lang].directoryText:key==="wells"?WELLS[lang].directoryText:t.info}</p></div><span class="directory-item__arrow" aria-hidden="true">↗</span></a>`).join("");const main=`<section class="directory-hero" aria-labelledby="page-title"><div class="directory-hero__inner"><div><p class="eyebrow">${t.eyebrow}</p><h1 id="page-title">${t.accent}</h1></div><p class="hero-note"><strong>${t.count}</strong>${t.note}</p></div></section><section class="directory" aria-labelledby="directory-title"><div class="directory__head"><p class="section-index">${t.list}</p><h2 id="directory-title">${t.choose}</h2></div><nav class="directory-list" aria-label="${t.hub}">${items}</nav></section>`;return shell(lang,"hub",main,`${t.hub} | AUTOPALĪDZĪBA.LV`,t.note);}
+function hub(lang) {
+  const t=C[lang], from=ROUTES.hub[lang];
+  const items=["wells","waste","fitness"].map((key,i)=>`<a class="directory-item" href="${rel(from,ROUTES[key][lang])}"><span class="directory-item__number">0${i+1}</span><div class="directory-item__copy"><h3>${t.services[key]}</h3><p>${key==="fitness"?FITNESS[lang].directoryText:key==="wells"?WELLS[lang].directoryText:CRANE[lang].directoryText}</p></div><span class="directory-item__arrow" aria-hidden="true">↗</span></a>`).join("");
+  const main=`<section class="directory-hero" aria-labelledby="page-title"><div class="directory-hero__inner"><div><p class="eyebrow">${t.eyebrow}</p><h1 id="page-title">${t.accent}</h1></div><p class="hero-note"><strong>${t.count}</strong>${t.note}</p></div></section><section class="directory" aria-labelledby="directory-title"><div class="directory__head"><p class="section-index">${t.list}</p><h2 id="directory-title">${t.choose}</h2></div><nav class="directory-list" aria-label="${t.hub}">${items}</nav></section>`;
+  return shell(lang,"hub",main,`${t.hub} | AUTOPALĪDZĪBA.LV`,t.note);
+}
+function crane(lang) {
+  const c=CRANE[lang], t=C[lang], from=ROUTES.waste[lang], root=rel(from,[]);
+  const photo=(stem, alt, width, height, hero=false, fullWidth=false)=>`<img src="${root}assets/images/${stem}-1280.webp" srcset="${root}assets/images/${stem}-640.webp 640w, ${root}assets/images/${stem}-1280.webp 1280w, ${root}assets/images/${stem}-1600.webp 1600w" sizes="${hero?'100vw':fullWidth?'94vw':'(max-width: 820px) 90vw, 46vw'}" alt="${esc(alt)}" width="${width}" height="${height}" ${hero?'fetchpriority="high"':'loading="lazy" decoding="async"'}>`;
+  const serviceRows=c.services.map(([heading,body],i)=>`<li><span>0${i+1}</span><div><h3>${esc(heading)}</h3><p>${esc(body)}</p></div></li>`).join("");
+  const gallery=[['crane-vehicle',1600,1028],['crane-roadside',1600,1200],['crane-loading',1600,1135]].map(([stem,w,h],i)=>`<figure class="crane-photo">${photo(stem,c.alts[i],w,h,false,i===0)}<figcaption><span>0${i+1}</span>${esc(c.captions[i])}</figcaption></figure>`).join("");
+  const schema={
+    '@context':'https://schema.org', '@type':'Service',
+    '@id':`${absolute(from)}#service`, url:absolute(from), name:c.title, description:c.description,
+    serviceType:c.name, image:`${BASE}/assets/images/crane-sauna-1600.webp`,
+    provider:{'@type':'LocalBusiness','@id':`${BASE}/#sos-evakuators`,name:'SOS Evakuators',url:`${BASE}/`,telephone:'+37122002700'},
+    areaServed:[{'@type':'City',name:'Daugavpils'},{'@type':'AdministrativeArea',name:'Latgale'}]
+  };
+  const main=`<section class="crane-hero" aria-labelledby="page-title">
+    <div class="crane-hero__media">${photo('crane-sauna',c.heroAlt,1600,1200,true)}</div><div class="crane-hero__shade"></div>
+    <div class="crane-hero__inner"><nav class="breadcrumb" aria-label="${t.hub}"><a href="${rel(from,ROUTES.hub[lang])}">${t.hub}</a><span aria-hidden="true">/</span><span>${esc(c.name)}</span></nav>
+      <div class="crane-hero__copy"><p class="crane-kicker">Daugavpils / Latgale</p><h1 id="page-title">${c.heading}<span>${esc(c.region)}</span></h1><p class="crane-lead">${esc(c.lead)}</p>
+        <div class="crane-actions"><a class="crane-call" data-dock-watch href="tel:+37122002700"><span>${c.call}</span><strong>+371 22002700</strong></a><a class="crane-work-link" href="#crane-work">${c.photosLink}<span aria-hidden="true">↓</span></a></div>
+      </div>
+    </div>
+  </section>
+  <section class="crane-services" aria-labelledby="crane-services-title"><div class="crane-services__intro"><p class="section-index">01 / ${c.introKicker}</p><h2 id="crane-services-title">${c.introHeading}</h2><p>${c.introText}</p></div><ul class="crane-services__list">${serviceRows}</ul></section>
+  <section class="crane-gallery" id="crane-work" aria-labelledby="crane-gallery-title"><header><p class="section-index">02 / ${c.galleryKicker}</p><h2 id="crane-gallery-title">${c.galleryHeading}</h2></header><div class="crane-gallery__grid">${gallery}</div></section>
+  <section class="crane-contact" aria-labelledby="crane-contact-title"><div><p class="section-index">03 / ${c.regionKicker}</p><h2 id="crane-contact-title">${c.regionHeading}</h2></div><div class="crane-contact__details"><p>${c.regionText}</p><a class="crane-call" href="tel:+37122002700"><span>${c.call}</span><strong>+371 22002700</strong></a><a class="crane-second" href="tel:+37120091762"><span>${c.second}</span><strong>+371 20091762</strong></a></div></section>`;
+  return shell(lang,'waste',main,c.title,c.description,{ogImage:'assets/images/crane-sauna-1600.webp',ogImageAlt:c.heroAlt})
+    .replace('</head>',`  <script type="application/ld+json">${JSON.stringify(schema).replace(/</g,'\\u003c')}</script>\n</head>`);
+}
 function fitness(lang) {
   const t = C[lang], f = FITNESS[lang], from = ROUTES.fitness[lang];
   const hubHref = rel(from, ROUTES.hub[lang]), root = rel(from, []);
@@ -188,6 +223,17 @@ function wells(lang) {
     <div class="page-actions"><a class="page-action page-action--secondary" href="${hubHref}">${t.all}</a><a class="page-action page-action--secondary" href="${rel(from,HOME[lang])}">${t.main}</a></div></section>`;
   return shell(lang, "wells", main, w.title, w.description, { phone: WELLS_PHONE, dockCall: w.dockCall });
 }
-function service(lang,key){if(key==="fitness")return fitness(lang);if(key==="wells")return wells(lang);const t=C[lang],from=ROUTES[key][lang],name=t.services[key],hubHref=rel(from,ROUTES.hub[lang]),number=String(["wells","waste","fitness"].indexOf(key)+1).padStart(2,"0");const main=`<section class="service-hero" aria-labelledby="page-title"><div class="service-hero__inner"><div class="service-hero__meta"><div><nav class="breadcrumb" aria-label="${t.hub}"><a href="${hubHref}">${t.hub}</a><span aria-hidden="true">/</span><span>${name}</span></nav><h1 id="page-title">${name}.</h1></div><p class="service-status"><strong>${t.preparing}</strong>${t.status}</p></div></div></section><section class="placeholder-section" aria-labelledby="placeholder-title"><div class="placeholder-grid"><div class="placeholder-copy"><p class="section-index">${number} / ${name}</p><h2 id="placeholder-title">${t.placeholder}</h2><p>${t.placeholderText}</p></div><div class="placeholder-panel" aria-label="${t.planned}">${t.rows.map((row,i)=>`<div class="placeholder-row"><span>0${i+1}</span><strong>${row}</strong></div>`).join("")}</div></div><div class="page-actions"><a class="page-action" href="${hubHref}">${t.all}</a><a class="page-action page-action--secondary" href="${rel(from,HOME[lang])}">${t.main}</a></div></section>`;return shell(lang,key,main,`${name} | ${t.hub}`,`${name} — ${t.hub}, AUTOPALĪDZĪBA.LV, Daugavpils. ${t.status}`);}
+function service(lang,key) {
+  if(key==='fitness') return fitness(lang);
+  if(key==='wells') return wells(lang);
+  if(key==='waste') return crane(lang);
+  throw new Error(`Unknown service: ${key}`);
+}
 for(const lang of LANGS){for(const page of Object.keys(ROUTES)){const html=page==="hub"?hub(lang):service(lang,page),dir=path.join(ROOT,...ROUTES[page][lang]);fs.mkdirSync(dir,{recursive:true});fs.writeFileSync(path.join(dir,"index.html"),html);}}
-console.log(`Additional services: 12 localized pages written (${PRODUCTION ? "production" : "concept"})`);
+// Apache performs a 301 in production. These small fallbacks also work on static hosts.
+for(const lang of LANGS) {
+  const old=LEGACY_WASTE[lang], target=absolute(ROUTES.waste[lang]), href=rel(old,ROUTES.waste[lang]), dir=path.join(ROOT,...old);
+  fs.mkdirSync(dir,{recursive:true});
+  fs.writeFileSync(path.join(dir,'index.html'),`<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,follow"><meta http-equiv="refresh" content="0;url=${href}"><link rel="canonical" href="${target}"><title>${CRANE[lang].name}</title></head><body><a href="${href}">${CRANE[lang].name} →</a></body></html>\n`);
+}
+console.log(`Additional services: 12 localized pages and 3 legacy redirects written (${PRODUCTION ? "production" : "concept"})`);
