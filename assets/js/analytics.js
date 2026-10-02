@@ -235,7 +235,9 @@
     const place = () => {
       const dockUsed = !!dock && getComputedStyle(dock).display !== "none";
       const dockShown = dockUsed && dock.classList.contains("is-visible");
-      box.style.display = narrow.matches && dockUsed && !dockShown ? "none" : "grid";
+      // Isolated service pages use display:none for a hidden dock. Its existence,
+      // not its current display, decides whether the banner must wait for scrolling.
+      box.style.display = narrow.matches && dock && !dockShown ? "none" : "grid";
       box.style.left = narrow.matches ? "12px" : "auto";
       box.style.bottom = narrow.matches && dockShown ? `${Math.round(dock.getBoundingClientRect().height) + 12}px` : "16px";
     };

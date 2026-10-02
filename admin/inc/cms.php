@@ -8,7 +8,7 @@ const CMS_PRIMARY_TEL = '+37122002700';
 const CMS_SECONDARY_PHONE = '+371 20091762';
 const CMS_SECONDARY_TEL = '+37120091762';
 const CMS_EMAIL = 'tktrans@inbox.lv';
-const CMS_ANALYTICS_VERSION = '20260912-bots';
+const CMS_ANALYTICS_VERSION = '20261002-crane';
 const CMS_PUBLISHED_MARK = '<!-- cms:published -->';
 // Prices as they are written in the built pages (the CMS rewrites every occurrence when they change).
 const CMS_PRICE_DEFAULTS = ['auto' => '30', 'auto_km' => '0.80', 'kravas' => '150', 'kravas_km' => '1.50'];
